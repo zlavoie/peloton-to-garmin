@@ -20,6 +20,8 @@ using Philosowaffle.Capability.ReleaseChecks;
 using Garmin.Auth;
 using Serilog.Settings.Configuration;
 using Common.Observe;
+using Garmin.Auth.Interfaces;
+using Common.Service.Interfaces;
 
 Statics.AppType = Constants.ConsoleAppName;
 Statics.MetricPrefix = Constants.ConsoleAppName;
@@ -71,11 +73,14 @@ static IHostBuilder CreateHostBuilder(string[] args)
 			// IO
 			services.AddSingleton<IFileHandling, IOWrapper>();
 
+			// DB
+			services.AddSingleton<ISettingsRepository, SettingsRepository>();
+
 			// SETTINGS
 			services.AddSingleton<ISettingsDb, SettingsDb>();
 			services.AddSingleton<ISettingsService>((serviceProvider) =>
 			{
-				var settingService = new SettingsService(serviceProvider.GetService<ISettingsDb>(), serviceProvider.GetService<IMemoryCache>(), serviceProvider.GetService<IConfiguration>(), serviceProvider.GetService<IFileHandling>());
+				var settingService = new SettingsService(serviceProvider.GetService<IMemoryCache>(), serviceProvider.GetService<IConfiguration>(), serviceProvider.GetService<IFileHandling>(), serviceProvider.GetService<ISettingsRepository>());
 				IMemoryCache memCache = serviceProvider.GetService<IMemoryCache>();
 				IFileHandling fileHandler = serviceProvider.GetService<IFileHandling>();
 				return new FileBasedSettingsService(serviceProvider.GetService<IConfiguration>(), settingService, memCache, fileHandler);

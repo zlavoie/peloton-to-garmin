@@ -2,6 +2,7 @@
 using Common.Observe;
 using Common.Service;
 using Common.Stateful;
+using Garmin.Auth.Interfaces;
 using Prometheus;
 using Serilog;
 using System;

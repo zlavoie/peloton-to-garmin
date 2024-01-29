@@ -66,6 +66,7 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 			Password = settings.Garmin.Password,
 			AuthStage = AuthStage.None
 		};
+		CookieJar jar = null;
 
 		Common.AppConfiguration appConfig = await _settingsService.GetAppConfigurationAsync();
 		if (!string.IsNullOrEmpty(appConfig.Developer.UserAgent))

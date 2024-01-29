@@ -4,6 +4,7 @@ using Common.Service;
 using Common.Stateful;
 using Core.GitHub;
 using Garmin;
+using Garmin.Auth.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Peloton;
 using Prometheus;
