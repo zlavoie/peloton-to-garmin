@@ -14,13 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
 
 namespace Dynastream.Fit
 {
-   class HrToRecordMesgBroadcastPlugin : IMesgBroadcastPlugin
+	class HrToRecordMesgBroadcastPlugin : IMesgBroadcastPlugin
    {
       #region Fields
       private bool isActivityFile = false;

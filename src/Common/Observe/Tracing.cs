@@ -40,7 +40,7 @@ namespace Common.Observe
 			if (!config.Enabled)
 				return tracing;
 
-			var builder = Sdk.CreateTracerProviderBuilder()
+			TracerProvider builder = Sdk.CreateTracerProviderBuilder()
 				.ConfigureDefaultBuilder(config)
 				.Build();
 
@@ -119,7 +119,7 @@ namespace Common.Observe
 
 		public static Activity Trace(string name, string category = "app", ActivityKind kind = ActivityKind.Server)
 		{
-			var activity = Source?.StartActivity(name, kind);
+			Activity activity = Source?.StartActivity(name, kind);
 
 			activity?
 				.SetTag(TagKey.Category, category)
@@ -138,7 +138,7 @@ namespace Common.Observe
 				Activity.Current = Source?.CreateActivity(name, kind);
 			}
 
-			var activity = Source?.StartActivity(name, kind);
+			Activity activity = Source?.StartActivity(name, kind);
 
 			activity?
 				.SetTag(TagKey.Category, category)
@@ -197,7 +197,7 @@ namespace Common.Observe
 			{
 				if (rawEventObject is HttpResponseMessage response)
 				{
-					var content = response.Content?.ReadAsStringAsync().GetAwaiter().GetResult() ?? "no_content";
+					string content = response.Content?.ReadAsStringAsync().GetAwaiter().GetResult() ?? "no_content";
 					activity.SetTag("http.response.body", content);
 				}
 			}
@@ -215,7 +215,7 @@ namespace Common.Observe
 			if (name.Equals("OnStartActivity")
 				&& rawEventObject is HttpRequest httpRequest)
 			{
-				if (httpRequest.Headers.TryGetValue("TraceId", out var incomingTraceParent))
+				if (httpRequest.Headers.TryGetValue("TraceId", out Microsoft.Extensions.Primitives.StringValues incomingTraceParent))
 					activity.SetParentId(incomingTraceParent);
 
 				if (httpRequest.Headers.TryGetValue("uber-trace-id", out incomingTraceParent))

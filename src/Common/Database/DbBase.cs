@@ -34,7 +34,7 @@ namespace Common.Database
 				_logger.Debug("Creating {@DbName} db: {@Path}", dbName, path);
 				try
 				{
-					var dir = Path.GetDirectoryName(path);
+					string dir = Path.GetDirectoryName(path);
 					_fileHandler.MkDirIfNotExists(dir);
 					File.WriteAllText(path, "{}");
 

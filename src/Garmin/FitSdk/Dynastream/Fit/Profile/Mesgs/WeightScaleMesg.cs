@@ -13,18 +13,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the WeightScale profile message.
-    /// </summary>
-    public class WeightScaleMesg : Mesg
+	/// <summary>
+	/// Implements the WeightScale profile message.
+	/// </summary>
+	public class WeightScaleMesg : Mesg
     {
         #region Fields
         #endregion

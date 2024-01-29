@@ -28,13 +28,13 @@ public class VersionInformationService : IVersionInformationService
 
 	public Task<LatestReleaseInformation> GetLatestReleaseInformationAsync()
 	{
-		using var tracing = Tracing.Trace($"{nameof(VersionInformationService)}.{nameof(GetLatestReleaseInformationAsync)}");
+		using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(VersionInformationService)}.{nameof(GetLatestReleaseInformationAsync)}");
 
 		try
 		{
 			lock (_lock)
 			{
-				var key = $"LatestReleaseInformation";
+				string key = $"LatestReleaseInformation";
 				return _cache.GetOrCreateAsync(key, (cacheEntry) =>
 				{
 					cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);

@@ -11,7 +11,7 @@ public static class FileHelper
 	{
 		using (var reader = new StreamReader(path))
 		{
-			var content = await reader.ReadToEndAsync();
+			string content = await reader.ReadToEndAsync();
 			return content;
 		}
 	}

@@ -13,18 +13,14 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// The DateTime class implements the Fit date_time type which references
-    /// UTC 00:00 Dec 31 1989 in second resolution
-    /// </summary>
-    public class DateTime
+	/// <summary>
+	/// The DateTime class implements the Fit date_time type which references
+	/// UTC 00:00 Dec 31 1989 in second resolution
+	/// </summary>
+	public class DateTime
     {
         #region Fields
         private double fractionalTimeStamp;

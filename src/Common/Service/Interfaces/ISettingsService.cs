@@ -8,7 +8,8 @@ namespace Common.Service
 	public interface ISettingsService
 	{
 		Task<Settings> GetSettingsAsync();
-		Task UpdateSettingsAsync(Settings settings);
+
+		Task<Settings> UpdateSettingsAsync(Settings settings);
 
 		Task<AppConfiguration> GetAppConfigurationAsync();
 

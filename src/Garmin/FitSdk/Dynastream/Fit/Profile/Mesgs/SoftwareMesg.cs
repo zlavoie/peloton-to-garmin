@@ -13,18 +13,15 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
-using System.IO;
 using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the Software profile message.
-    /// </summary>
-    public class SoftwareMesg : Mesg
+	/// <summary>
+	/// Implements the Software profile message.
+	/// </summary>
+	public class SoftwareMesg : Mesg
     {
         #region Fields
         #endregion

@@ -92,7 +92,7 @@ namespace Dynastream.Fit
                 }
             }
 
-            foreach (var fld in mesg.DeveloperFields)
+            foreach (DeveloperField fld in mesg.DeveloperFields)
             {
                 if (fld.GetNumValues() > 0)
                 {

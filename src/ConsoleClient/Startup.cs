@@ -4,14 +4,12 @@ using Common.Service;
 using Common.Stateful;
 using Core.GitHub;
 using Garmin;
-using Garmin.Auth;
 using Microsoft.Extensions.Hosting;
 using Peloton;
 using Prometheus;
 using Serilog;
 using Sync;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using static Common.Observe.Metrics;
@@ -45,7 +43,7 @@ namespace ConsoleClient
 			_logger.Verbose("Begin.");
 
 			var settings = await _settingsService.GetSettingsAsync();
-			var appConfig = await _settingsService.GetAppConfigurationAsync();
+			AppConfiguration appConfig = await _settingsService.GetAppConfigurationAsync();
 
 			try
 			{
@@ -56,7 +54,7 @@ namespace ConsoleClient
 
 				if (settings.App.CheckForUpdates)
 				{
-					var latestReleaseInformation = await _githubService.GetLatestReleaseInformationAsync("philosowaffle", "peloton-to-garmin", Constants.AppVersion);
+					Philosowaffle.Capability.ReleaseChecks.Model.LatestReleaseInformation latestReleaseInformation = await _githubService.GetLatestReleaseInformationAsync("philosowaffle", "peloton-to-garmin", Constants.AppVersion);
 					if (latestReleaseInformation.IsReleaseNewerThanInstalledVersion)
 					{
 						_logger.Information("*********************************************");
@@ -85,12 +83,12 @@ namespace ConsoleClient
 		{
 			int exitCode = 0;
 
-			var appConfig = await _settingsService.GetAppConfigurationAsync();
+			AppConfiguration appConfig = await _settingsService.GetAppConfigurationAsync();
 
 			Log.Information("*********************************************");
-			using var metrics = Metrics.EnableMetricsServer(appConfig.Observability.Prometheus);
-			using var metricsCollector = Metrics.EnableCollector(appConfig.Observability.Prometheus);
-			using var tracing = Tracing.EnableConsoleTracing(appConfig.Observability.Jaeger);
+			using IMetricServer metrics = Metrics.EnableMetricsServer(appConfig.Observability.Prometheus);
+			using IDisposable metricsCollector = Metrics.EnableCollector(appConfig.Observability.Prometheus);
+			using OpenTelemetry.Trace.TracerProvider tracing = Tracing.EnableConsoleTracing(appConfig.Observability.Jaeger);
 			Log.Information("*********************************************");
 
 			Tracing.Source = new(Statics.TracingService);
@@ -122,7 +120,7 @@ namespace ConsoleClient
 
 						if (settings.App.CheckForUpdates)
 						{
-							var latestReleaseInformation = await _githubService.GetLatestReleaseInformationAsync("philosowaffle", "peloton-to-garmin", Constants.AppVersion);
+							Philosowaffle.Capability.ReleaseChecks.Model.LatestReleaseInformation latestReleaseInformation = await _githubService.GetLatestReleaseInformationAsync("philosowaffle", "peloton-to-garmin", Constants.AppVersion);
 							if (latestReleaseInformation.IsReleaseNewerThanInstalledVersion)
 							{
 								_logger.Information("*********************************************");
@@ -141,8 +139,8 @@ namespace ConsoleClient
 						Log.Information("Done");
 						Log.Information("Sleeping for {@Seconds} seconds...", settings.App.PollingIntervalSeconds);
 
-						var now = DateTime.UtcNow;
-						var nextRunTime = now.AddSeconds(settings.App.PollingIntervalSeconds);
+						DateTime now = DateTime.UtcNow;
+						DateTime nextRunTime = now.AddSeconds(settings.App.PollingIntervalSeconds);
 						NextSyncTime.Set(new DateTimeOffset(nextRunTime).ToUnixTimeSeconds());
 						Thread.Sleep(settings.App.PollingIntervalSeconds * 1000);
 					}
@@ -154,8 +152,8 @@ namespace ConsoleClient
 						await _garminAuthService.RefreshGarminAuthenticationAsync();
 						
 						Console.WriteLine("Detected Garmin Two Factor Enabled. Please check your email or phone for the Security Passcode sent by Garmin.");
-						var mfaCode = string.Empty;
-						var retryCount = 5;
+						string mfaCode = string.Empty;
+						int retryCount = 5;
 						while (retryCount > 0 && string.IsNullOrWhiteSpace(mfaCode))
 						{
 							Console.Write("Enter Code: ");

@@ -14,7 +14,7 @@ public class JsonConverterTests
 	public void Converter_Should_Provide_Formt_of_TCX()
 	{
 		var mocker = new AutoMocker();
-		var converter = mocker.CreateInstance<JsonConverterInstance>();
+		JsonConverterInstance converter = mocker.CreateInstance<JsonConverterInstance>();
 
 		converter.Format.Should().Be(FileFormat.Json);
 	}
@@ -23,7 +23,7 @@ public class JsonConverterTests
 	public void ShouldConvert_ShouldOnly_Support_TCX([Values] bool tcx, [Values] bool json, [Values] bool fit)
 	{
 		var mocker = new AutoMocker();
-		var converter = mocker.CreateInstance<JsonConverterInstance>();
+		JsonConverterInstance converter = mocker.CreateInstance<JsonConverterInstance>();
 
 		var formatSettings = new Format()
 		{

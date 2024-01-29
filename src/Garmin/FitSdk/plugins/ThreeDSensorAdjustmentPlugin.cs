@@ -14,13 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
 
 namespace Dynastream.Fit
 {
-    public class ThreeDSensorAdjustmentPlugin : IMesgBroadcastPlugin
+	public class ThreeDSensorAdjustmentPlugin : IMesgBroadcastPlugin
     {
 
         #region Fields

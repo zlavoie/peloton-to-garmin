@@ -14,19 +14,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using System.IO;
 using System.Linq;
 using Dynastream.Utility;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Architecture defaults to Little Endian (unless decoded from an binary defn as Big Endian)
-    /// This could be exposed in the future to programatically create BE streams.
-    /// </summary>
-    public class MesgDefinition
+	/// <summary>
+	/// Architecture defaults to Little Endian (unless decoded from an binary defn as Big Endian)
+	/// This could be exposed in the future to programatically create BE streams.
+	/// </summary>
+	public class MesgDefinition
     {
         #region Fields
         private byte architecture;
@@ -324,7 +322,7 @@ namespace Dynastream.Fit
 
             foreach (DeveloperFieldDefinition fieldDef in mesgDef.DeveloperFieldDefinitions)
             {
-                var supportedFieldDef =
+				DeveloperFieldDefinition supportedFieldDef =
                     GetDeveloperFieldDefinition(fieldDef.FieldNum, fieldDef.DeveloperDataIndex);
 
                 if (supportedFieldDef == null)

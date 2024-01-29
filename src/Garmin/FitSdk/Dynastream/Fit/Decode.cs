@@ -13,17 +13,15 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Event Args Class associated with the DeveloperFieldDescrtiption Event
-    /// </summary>
-    public class DeveloperFieldDescriptionEventArgs : EventArgs
+	/// <summary>
+	/// Event Args Class associated with the DeveloperFieldDescrtiption Event
+	/// </summary>
+	public class DeveloperFieldDescriptionEventArgs : EventArgs
     {
         public DeveloperFieldDescription Description { get; private set; }
 

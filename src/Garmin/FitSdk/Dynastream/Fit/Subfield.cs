@@ -14,18 +14,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// The Subfield class represents an alternative field definition used
-    /// by dynamic fields.  They can only be associated with a containing
-    /// field object.
-    /// </summary>
-    public class Subfield
+	/// <summary>
+	/// The Subfield class represents an alternative field definition used
+	/// by dynamic fields.  They can only be associated with a containing
+	/// field object.
+	/// </summary>
+	public class Subfield
     {
         #region Internal Classes
         /// <summary>

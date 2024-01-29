@@ -17,9 +17,9 @@ Statics.ConfigPath = Path.Join(Environment.CurrentDirectory, "configuration.loca
 ///////////////////////////////////////////////////////////
 /// HOST
 ///////////////////////////////////////////////////////////
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-var configProvider = builder.Configuration.AddJsonFile(Statics.ConfigPath, optional: true, reloadOnChange: true)
+IConfigurationBuilder configProvider = builder.Configuration.AddJsonFile(Statics.ConfigPath, optional: true, reloadOnChange: true)
 				.AddEnvironmentVariables(prefix: "P2G_")
 				.AddCommandLine(args);
 
@@ -46,7 +46,7 @@ Common.Observe.Metrics.CreateAppInfo();
 /// APP
 ///////////////////////////////////////////////////////////
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (Log.IsEnabled(LogEventLevel.Verbose))
 	app.UseSerilogRequestLogging();

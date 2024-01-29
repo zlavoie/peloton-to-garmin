@@ -1,5 +1,4 @@
 ﻿using Api.Contract;
-using Common;
 using Common.Dto;
 using Flurl;
 using Flurl.Http;
@@ -27,7 +26,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -41,7 +40,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -56,7 +55,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -71,7 +70,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -86,7 +85,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -101,7 +100,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -119,7 +118,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -139,7 +138,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -154,7 +153,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -169,7 +168,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -183,7 +182,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -197,7 +196,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}
@@ -217,7 +216,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e) when (e.StatusCode is StatusCodes.Status400BadRequest)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 		catch (Exception e)
@@ -235,7 +234,7 @@ public class ApiClient : IApiClient
 		}
 		catch (FlurlHttpException e)
 		{
-			var error = await e.GetResponseJsonAsync<ErrorResponse>();
+			ErrorResponse error = await e.GetResponseJsonAsync<ErrorResponse>();
 			throw new ApiClientException(error?.Message, e);
 		}
 	}

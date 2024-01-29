@@ -2,6 +2,7 @@
 using Common.Service;
 using Common.Stateful;
 using Flurl.Http;
+using Garmin.Auth.Interfaces;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -11,13 +12,6 @@ using System.Threading.Tasks;
 using System.Web;
 
 namespace Garmin.Auth;
-
-public interface IGarminAuthenticationService
-{
-	Task<GarminApiAuthentication> GetGarminAuthenticationAsync();
-	Task<GarminApiAuthentication> RefreshGarminAuthenticationAsync();
-	Task<GarminApiAuthentication> CompleteMFAAuthAsync(string mfaCode);
-}
 
 public class GarminAuthenticationService : IGarminAuthenticationService
 {
@@ -47,7 +41,7 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 		var settings = await _settingsService.GetSettingsAsync();
 		settings.Garmin.EnsureGarminCredentialsAreProvided();
 
-		var auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
+		GarminApiAuthentication auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
 		if (auth is object && auth.IsValid(settings))
 			return auth;
 
@@ -66,13 +60,14 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 
 		_settingsService.ClearGarminAuthentication(settings.Garmin.Email);
 
-		var auth = new GarminApiAuthentication();
-		auth.Email = settings.Garmin.Email;
-		auth.Password = settings.Garmin.Password;
-		CookieJar jar = null;
-		auth.AuthStage = AuthStage.None;
+		var auth = new GarminApiAuthentication()
+		{
+			Email = settings.Garmin.Email,
+			Password = settings.Garmin.Password,
+			AuthStage = AuthStage.None
+		};
 
-		var appConfig = await _settingsService.GetAppConfigurationAsync();
+		Common.AppConfiguration appConfig = await _settingsService.GetAppConfigurationAsync();
 		if (!string.IsNullOrEmpty(appConfig.Developer.UserAgent))
 			auth.UserAgent = appConfig.Developer.UserAgent;
 
@@ -130,7 +125,7 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 		}
 		catch (FlurlHttpException e) when (e.StatusCode is (int)HttpStatusCode.Forbidden)
 		{
-			var responseContent = (await e.GetResponseStringAsync()) ?? string.Empty;
+			string responseContent = (await e.GetResponseStringAsync()) ?? string.Empty;
 
 			if (responseContent == "error code: 1020")
 				throw new GarminAuthenticationError("Garmin Authentication Failed. Blocked by CloudFlare.", e) { Code = Code.Cloudflare };
@@ -146,7 +141,7 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 			if (!settings.Garmin.TwoStepVerificationEnabled)
 				throw new GarminAuthenticationError("Detected Garmin TwoFactorAuthentication but TwoFactorAuthenctication is not enabled in P2G settings. Please enable TwoFactorAuthentication in your P2G Garmin settings.") { Code = Code.UnexpectedMfa };
 
-			var mfaCsrfToken = FindCsrfToken(sendCredentialsResult.RawResponseBody, failureStepCode: Code.FailedPriorToMfaUsed);
+			string mfaCsrfToken = FindCsrfToken(sendCredentialsResult.RawResponseBody, failureStepCode: Code.FailedPriorToMfaUsed);
 			auth.AuthStage = AuthStage.NeedMfaToken;
 			auth.MFACsrfToken = mfaCsrfToken;
 			auth.CookieJar = jar;
@@ -154,7 +149,7 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 			return auth;
 		}
 
-		var loginResult = sendCredentialsResult?.RawResponseBody;
+		string loginResult = sendCredentialsResult?.RawResponseBody;
 		return await CompleteGarminAuthenticationAsync(loginResult, auth);
 	}
 
@@ -162,11 +157,11 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 	{
 		// Try to find the full post login ServiceTicket
 		var ticketRegex = new Regex("embed\\?ticket=(?<ticket>[^\"]+)\"");
-		var ticketMatch = ticketRegex.Match(loginResult);
+		Match ticketMatch = ticketRegex.Match(loginResult);
 		if (!ticketMatch.Success)
 			throw new GarminAuthenticationError("Auth appeared successful but failed to find regex match for service ticket.") { Code = Code.AuthAppearedSuccessful };
 
-		var ticket = ticketMatch.Groups.GetValueOrDefault("ticket").Value;
+		string ticket = ticketMatch.Groups.GetValueOrDefault("ticket").Value;
 		_logger.Verbose($"Service Ticket: {ticket}");
 
 		if (string.IsNullOrWhiteSpace(ticket))
@@ -175,7 +170,7 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 		////////////////////////////////////////////
 		// Get OAuth1 Tokens
 		///////////////////////////////////////////
-		var consumerCredentials = await _apiClient.GetConsumerCredentialsAsync();
+		ConsumerCredentials consumerCredentials = await _apiClient.GetConsumerCredentialsAsync();
 		await GetOAuth1Async(ticket, auth, consumerCredentials);
 
 		////////////////////////////////////////////
@@ -199,7 +194,7 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 	public async Task<GarminApiAuthentication> CompleteMFAAuthAsync(string mfaCode)
 	{
 		var settings = await _settingsService.GetSettingsAsync();
-		var auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
+		GarminApiAuthentication auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
 
 		if (auth is null || auth.AuthStage == AuthStage.None)
 			throw new ArgumentException("Garmin Auth has not been initialized, cannot provide MFA token yet.");
@@ -226,7 +221,7 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 		}
 		catch (FlurlHttpException e) when (e.StatusCode is (int)HttpStatusCode.Forbidden)
 		{
-			var responseContent = (await e.GetResponseStringAsync()) ?? string.Empty;
+			string responseContent = (await e.GetResponseStringAsync()) ?? string.Empty;
 
 			if (responseContent == "error code: 1020")
 				throw new GarminAuthenticationError("MFA: Garmin Authentication Failed. Blocked by CloudFlare.", e) { Code = Code.Cloudflare };
@@ -240,11 +235,11 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 		try
 		{
 			var tokenRegex = new Regex("name=\"_csrf\"\\s+value=\"(?<csrf>.+?)\"");
-			var match = tokenRegex.Match(rawResponseBody);
+			Match match = tokenRegex.Match(rawResponseBody);
 			if (!match.Success)
 				throw new GarminAuthenticationError($"Failed to find regex match for csrf token. tokenResult: {rawResponseBody}") { Code = failureStepCode };
 
-			var csrfToken = match.Groups.GetValueOrDefault("csrf")?.Value;
+			string csrfToken = match.Groups.GetValueOrDefault("csrf")?.Value;
 			_logger.Verbose($"Csrf Token: {csrfToken}");
 
 			if (string.IsNullOrWhiteSpace(csrfToken))
@@ -271,10 +266,10 @@ public class GarminAuthenticationService : IGarminAuthenticationService
 		if (string.IsNullOrWhiteSpace(oauth1Response))
 			throw new GarminAuthenticationError("Auth appeared successful but returned OAuth1 Token response is null.") { Code = Code.AuthAppearedSuccessful };
 
-		var queryParams = HttpUtility.ParseQueryString(oauth1Response);
+		System.Collections.Specialized.NameValueCollection queryParams = HttpUtility.ParseQueryString(oauth1Response);
 
-		var oAuthToken = queryParams.Get("oauth_token");
-		var oAuthTokenSecret = queryParams.Get("oauth_token_secret");
+		string oAuthToken = queryParams.Get("oauth_token");
+		string oAuthTokenSecret = queryParams.Get("oauth_token_secret");
 
 		if (string.IsNullOrWhiteSpace(oAuthToken))
 			throw new GarminAuthenticationError($"Auth appeared successful but returned OAuth1 token is null. oauth1Response: {oauth1Response}") { Code = Code.AuthAppearedSuccessful };

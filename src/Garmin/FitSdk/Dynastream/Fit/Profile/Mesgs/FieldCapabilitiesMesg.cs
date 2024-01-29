@@ -13,18 +13,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the FieldCapabilities profile message.
-    /// </summary>
-    public class FieldCapabilitiesMesg : Mesg
+	/// <summary>
+	/// Implements the FieldCapabilities profile message.
+	/// </summary>
+	public class FieldCapabilitiesMesg : Mesg
     {
         #region Fields
         #endregion

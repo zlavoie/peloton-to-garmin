@@ -13,18 +13,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the ObdiiData profile message.
-    /// </summary>
-    public class ObdiiDataMesg : Mesg
+	/// <summary>
+	/// Implements the ObdiiData profile message.
+	/// </summary>
+	public class ObdiiDataMesg : Mesg
     {
         #region Fields
         #endregion

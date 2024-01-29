@@ -1,5 +1,4 @@
-﻿using Common;
-using Common.Dto;
+﻿using Common.Dto;
 using Common.Service;
 using Common.Stateful;
 using Flurl.Http.Testing;
@@ -21,11 +20,11 @@ namespace UnitTests.Peloton
 		public async Task RowingWorkout_CanBe_Deserialized_To_Workout()
 		{
 			var autoMocker = new AutoMocker();
-			var apiClient = autoMocker.CreateInstance<ApiClient>();
-			var settingsService = autoMocker.GetMock<ISettingsService>();
+			ApiClient apiClient = autoMocker.CreateInstance<ApiClient>();
+			Mock<ISettingsService> settingsService = autoMocker.GetMock<ISettingsService>();
 			SetupSuccessfulAuth(settingsService);
 
-			var responseData = await FileHelper.ReadTextFromFileAsync(Path.Join(DataDirectory, "rower_sample.json"));
+			string responseData = await FileHelper.ReadTextFromFileAsync(Path.Join(DataDirectory, "rower_sample.json"));
 
 			var httpMock = new HttpTest();
 			httpMock
@@ -42,11 +41,11 @@ namespace UnitTests.Peloton
 		public async Task RowingWorkout_CanBe_Deserialized_To_WorkoutSamples()
 		{
 			var autoMocker = new AutoMocker();
-			var apiClient = autoMocker.CreateInstance<ApiClient>();
-			var settingsService = autoMocker.GetMock<ISettingsService>();
+			ApiClient apiClient = autoMocker.CreateInstance<ApiClient>();
+			Mock<ISettingsService> settingsService = autoMocker.GetMock<ISettingsService>();
 			SetupSuccessfulAuth(settingsService);
 
-			var responseData = await FileHelper.ReadTextFromFileAsync(Path.Join(DataDirectory, "rower_performance_graph.json"));
+			string responseData = await FileHelper.ReadTextFromFileAsync(Path.Join(DataDirectory, "rower_performance_graph.json"));
 
 			var httpMock = new HttpTest();
 			httpMock

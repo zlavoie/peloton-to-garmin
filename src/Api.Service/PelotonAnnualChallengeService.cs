@@ -22,12 +22,12 @@ public class PelotonAnnualChallengeService : IPelotonAnnualChallengeService
 
 	public async Task<ServiceResult<ProgressGetResponse>> GetProgressAsync()
 	{
-		var userId = 1;
+		int userId = 1;
 		var result = new ServiceResult<ProgressGetResponse>();
 
 		try
 		{
-			var serviceResult = await _service.GetAnnualChallengeProgressAsync(userId);
+			ServiceResult<AnnualChallengeProgress> serviceResult = await _service.GetAnnualChallengeProgressAsync(userId);
 
 			if (serviceResult.IsErrored())
 			{
@@ -36,7 +36,7 @@ public class PelotonAnnualChallengeService : IPelotonAnnualChallengeService
 				return result;
 			}
 
-			var data = serviceResult.Result;
+			AnnualChallengeProgress data = serviceResult.Result;
 			var tiers = data.Tiers?.Select(t => t.Map()).ToList();
 
 			result.Result = new ProgressGetResponse()

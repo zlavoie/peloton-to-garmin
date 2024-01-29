@@ -14,16 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-
-using Dynastream.Utility;
-using Dynastream.Fit;
 
 namespace Dynastream.Fit
 {
-    public delegate void MesgBroadcastEventHandler(object sender, MesgBroadcastEventArgs e);
+	public delegate void MesgBroadcastEventHandler(object sender, MesgBroadcastEventArgs e);
     public delegate void IncomingMesgEventHandler(object sender, IncomingMesgEventArgs e);
 
     public class MesgBroadcastEventArgs : EventArgs

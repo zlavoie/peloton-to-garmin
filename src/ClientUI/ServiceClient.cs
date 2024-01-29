@@ -43,7 +43,7 @@ public class ServiceClient : IApiClient
 	{
 		try
 		{
-			var result = await _annualChallengeService.GetProgressAsync();
+			ServiceResult<ProgressGetResponse> result = await _annualChallengeService.GetProgressAsync();
 
 			if (result.IsErrored())
 				throw new ApiClientException(result.Error.Message, result.Error.Exception);
@@ -59,7 +59,7 @@ public class ServiceClient : IApiClient
 	public async Task<GarminAuthenticationGetResponse> GetGarminAuthenticationAsync()
 	{
 		var settings = await _settingsService.GetSettingsAsync();
-		var auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
+		Common.Stateful.GarminApiAuthentication auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
 
 		var result = new GarminAuthenticationGetResponse() { IsAuthenticated = auth?.IsValid(settings) ?? false };
 		return result;
@@ -67,7 +67,7 @@ public class ServiceClient : IApiClient
 
 	public async Task<PelotonWorkoutsGetResponse> PelotonWorkoutsGetAsync(PelotonWorkoutsGetRequest request)
 	{
-		if (!request.IsValid(out var result))
+		if (!request.IsValid(out ErrorResponse result))
 			throw new ApiClientException(result);
 
 		PagedPelotonResponse<Workout> recentWorkouts = null;
@@ -104,20 +104,20 @@ public class ServiceClient : IApiClient
 
 	public async Task<PelotonWorkoutsGetAllResponse> PelotonWorkoutsGetAsync(PelotonWorkoutsGetAllRequest request)
 	{
-		if (request.SinceDate.IsAfter(DateTime.UtcNow, nameof(request.SinceDate), out var result))
+		if (request.SinceDate.IsAfter(DateTime.UtcNow, nameof(request.SinceDate), out ErrorResponse result))
 			throw new ApiClientException(result!);
 
 		ICollection<Workout> workoutsToReturn = new List<Workout>();
-		var completedOnly = request.WorkoutStatusFilter == WorkoutStatus.Completed;
+		bool completedOnly = request.WorkoutStatusFilter == WorkoutStatus.Completed;
 
 		try
 		{
-			var serviceResult = await _pelotonService.GetWorkoutsSinceAsync(request.SinceDate);
+			ServiceResult<ICollection<Workout>> serviceResult = await _pelotonService.GetWorkoutsSinceAsync(request.SinceDate);
 
 			if (serviceResult.IsErrored())
 				throw new ApiClientException(new ErrorResponse(serviceResult.Error.Message));
 
-			foreach (var w in serviceResult.Result)
+			foreach (Workout w in serviceResult.Result)
 			{
 				if (completedOnly && w.Status != "COMPLETE")
 					continue;
@@ -183,7 +183,7 @@ public class ServiceClient : IApiClient
 	{
 		try
 		{
-			var result = await _settingsUpdaterService.UpdateAppSettingsAsync(appSettings);
+			ServiceResult<Common.Dto.App> result = await _settingsUpdaterService.UpdateAppSettingsAsync(appSettings);
 
 			if (result.IsErrored())
 				throw new ApiClientException(result.Error.Message, result.Error.Exception);
@@ -200,7 +200,7 @@ public class ServiceClient : IApiClient
 	{
 		try
 		{
-			var result = await _settingsUpdaterService.UpdateFormatSettingsAsync(formatSettings);
+			ServiceResult<Format> result = await _settingsUpdaterService.UpdateFormatSettingsAsync(formatSettings);
 
 			if (result.IsErrored())
 				throw new ApiClientException(result.Error.Message, result.Error.Exception);
@@ -217,7 +217,7 @@ public class ServiceClient : IApiClient
 	{
 		try
 		{
-			var result = await _settingsUpdaterService.UpdateGarminSettingsAsync(garminSettings);
+			ServiceResult<SettingsGarminGetResponse> result = await _settingsUpdaterService.UpdateGarminSettingsAsync(garminSettings);
 
 			if (result.IsErrored())
 				throw new ApiClientException(result.Error.Message, result.Error.Exception);
@@ -234,7 +234,7 @@ public class ServiceClient : IApiClient
 	{
 		try
 		{
-			var result = await _settingsUpdaterService.UpdatePelotonSettingsAsync(pelotonSettings);
+			ServiceResult<SettingsPelotonGetResponse> result = await _settingsUpdaterService.UpdatePelotonSettingsAsync(pelotonSettings);
 
 			if (result.IsErrored())
 				throw new ApiClientException(result.Error.Message, result.Error.Exception);
@@ -251,7 +251,7 @@ public class ServiceClient : IApiClient
 	{
 		var settings = await _settingsService.GetSettingsAsync();
 
-		if (settings.Garmin.Password.CheckIsNullOrEmpty("Garmin Password", out var result)) throw new ApiClientException(result);
+		if (settings.Garmin.Password.CheckIsNullOrEmpty("Garmin Password", out ErrorResponse result)) throw new ApiClientException(result);
 		if (settings.Garmin.Email.CheckIsNullOrEmpty("Garmin Email", out result)) throw new ApiClientException(result);
 
 		try
@@ -287,12 +287,12 @@ public class ServiceClient : IApiClient
 
 	public async Task<SyncGetResponse> SyncGetAsync()
 	{
-		var syncTimeTask = _syncStatusDb.GetSyncStatusAsync();
+		Task<SyncServiceStatus> syncTimeTask = _syncStatusDb.GetSyncStatusAsync();
 		var settingsTask = _settingsService.GetSettingsAsync();
 
 		await Task.WhenAll(syncTimeTask, settingsTask);
 
-		var syncTime = await syncTimeTask;
+		SyncServiceStatus syncTime = await syncTimeTask;
 		var settings = await settingsTask;
 
 		return new SyncGetResponse()
@@ -308,7 +308,7 @@ public class ServiceClient : IApiClient
 	public async Task<SyncPostResponse> SyncPostAsync(SyncPostRequest syncPostRequest)
 	{
 		var settings = await _settingsService.GetSettingsAsync();
-		var auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
+		Common.Stateful.GarminApiAuthentication auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
 
 		var (isValid, result) = syncPostRequest.IsValid(settings, auth);
 		if (!isValid)
@@ -336,7 +336,7 @@ public class ServiceClient : IApiClient
 
 	public async Task<SystemInfoGetResponse> SystemInfoGetAsync(SystemInfoGetRequest systemInfoGetRequest)
 	{
-		var result = await _systemInfoService.GetAsync(systemInfoGetRequest);
+		SystemInfoGetResponse result = await _systemInfoService.GetAsync(systemInfoGetRequest);
 		result.Api = null;
 		return result;
 	}
@@ -345,7 +345,7 @@ public class ServiceClient : IApiClient
 	{
 		try
 		{
-			var result = await _systemInfoService.GetLogsAsync();
+			ServiceResult<SystemInfoLogsGetResponse> result = await _systemInfoService.GetLogsAsync();
 
 			if (result.IsErrored())
 				throw new ApiClientException(result.Error.Message, result.Error.Exception);

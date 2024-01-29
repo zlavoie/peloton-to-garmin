@@ -13,18 +13,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the DeviceAuxBatteryInfo profile message.
-    /// </summary>
-    public class DeviceAuxBatteryInfoMesg : Mesg
+	/// <summary>
+	/// Implements the DeviceAuxBatteryInfo profile message.
+	/// </summary>
+	public class DeviceAuxBatteryInfoMesg : Mesg
     {
         #region Fields
         #endregion

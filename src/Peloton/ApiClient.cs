@@ -46,7 +46,7 @@ namespace Peloton
 
 			settings.Peloton.EnsurePelotonCredentialsAreProvided();
 
-			var auth = _settingsService.GetPelotonApiAuthentication(settings.Peloton.Email);
+			PelotonApiAuthentication auth = _settingsService.GetPelotonApiAuthentication(settings.Peloton.Email);
 			if (auth is object && auth.IsValid(settings))
 				return auth;
 
@@ -56,7 +56,7 @@ namespace Peloton
 
 			try
 			{
-				var response = await $"{AuthBaseUrl}"
+				AuthResponse response = await $"{AuthBaseUrl}"
 				.WithHeader("Accept-Language", "en-US")
 				.WithHeader("User-Agent", overrideUserAgent ?? "PostmanRuntime/7.26.20")
 				.StripSensitiveDataFromLogging(auth.Email, auth.Password)
@@ -90,7 +90,7 @@ namespace Peloton
 
 		public async Task<PagedPelotonResponse<Workout>> GetWorkoutsAsync(int pageSize, int page)
 		{
-			var auth = await GetAuthAsync();
+			PelotonApiAuthentication auth = await GetAuthAsync();
 			return await $"{BaseUrl}/user/{auth.UserId}/workouts"
 			.WithCookie("peloton_session_id", auth.SessionId)
 			.WithCommonHeaders()
@@ -107,7 +107,7 @@ namespace Peloton
 
 		public async Task<PelotonResponse<Workout>> GetWorkoutsAsync(DateTime fromUtc, DateTime toUtc)
 		{
-			var auth = await GetAuthAsync();
+			PelotonApiAuthentication auth = await GetAuthAsync();
 			return await $"{BaseUrl}/user/{auth.UserId}/workouts"
 			.WithCookie("peloton_session_id", auth.SessionId)
 			.WithCommonHeaders()
@@ -127,7 +127,7 @@ namespace Peloton
 		/// </summary>
 		public async Task<JObject> GetWorkoutsAsync(string userId, int numWorkouts, int page)
 		{
-			var auth = await GetAuthAsync();
+			PelotonApiAuthentication auth = await GetAuthAsync();
 			return await $"{BaseUrl}/user/{userId}/workouts"
 			.WithCookie("peloton_session_id", auth.SessionId)
 			.WithCommonHeaders()
@@ -144,7 +144,7 @@ namespace Peloton
 
 		public async Task<UserData> GetUserDataAsync()
 		{
-			var auth = await GetAuthAsync();
+			PelotonApiAuthentication auth = await GetAuthAsync();
 			return await $"{BaseUrl}/me"
 			.WithCookie("peloton_session_id", auth.SessionId)
 			.WithCommonHeaders()
@@ -154,7 +154,7 @@ namespace Peloton
 
 		public async Task<JObject> GetWorkoutByIdAsync(string id)
 		{
-			var auth = await GetAuthAsync();
+			PelotonApiAuthentication auth = await GetAuthAsync();
 			return await $"{BaseUrl}/workout/{id}"
 				.WithCookie("peloton_session_id", auth.SessionId)
 				.WithCommonHeaders()
@@ -168,7 +168,7 @@ namespace Peloton
 
 		public async Task<JObject> GetWorkoutSamplesByIdAsync(string id)
 		{
-			var auth = await GetAuthAsync();
+			PelotonApiAuthentication auth = await GetAuthAsync();
 			return await $"{BaseUrl}/workout/{id}/performance_graph"
 				.WithCookie("peloton_session_id", auth.SessionId)
 				.WithCommonHeaders()
@@ -182,7 +182,7 @@ namespace Peloton
 
 		public async Task<PelotonChallenges> GetJoinedChallengesAsync(int userId)
 		{
-			var auth = await GetAuthAsync();
+			PelotonApiAuthentication auth = await GetAuthAsync();
 			return await $"{BaseUrl}/user/{auth.UserId}/challenges/current"
 				.WithCookie("peloton_session_id", auth.SessionId)
 				.WithCommonHeaders()
@@ -196,7 +196,7 @@ namespace Peloton
 
 		public async Task<PelotonUserChallengeDetail> GetUserChallengeDetailsAsync(int userId, string challengeId)
 		{
-			var auth = await GetAuthAsync();
+			PelotonApiAuthentication auth = await GetAuthAsync();
 			return await $"{BaseUrl}/user/{auth.UserId}/challenge/{challengeId}"
 				.WithCookie("peloton_session_id", auth.SessionId)
 				.WithCommonHeaders()
@@ -206,7 +206,7 @@ namespace Peloton
 
 		public async Task<RideSegments> GetClassSegmentsAsync(string rideId)
 		{
-			var auth = await GetAuthAsync();
+			PelotonApiAuthentication auth = await GetAuthAsync();
 			return await $"{BaseUrl}/ride/{rideId}/details"
 				.WithCookie("peloton_session_id", auth.SessionId)
 				.WithCommonHeaders()

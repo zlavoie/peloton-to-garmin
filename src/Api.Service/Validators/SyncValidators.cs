@@ -1,6 +1,5 @@
 ﻿using Api.Contract;
 using Api.Service.Helpers;
-using Common;
 using Common.Dto;
 using Common.Stateful;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +10,7 @@ public static class SyncValidators
 {
 	public static (bool, ErrorResponse?) IsValid(this SyncPostRequest request, Settings settings, GarminApiAuthentication garminAuth)
 	{
-		if (request.IsNull("Request", out var result))
+		if (request.IsNull("Request", out ErrorResponse? result))
 			return (false, result);
 
 		if (settings.Garmin.Upload && settings.Garmin.TwoStepVerificationEnabled)
@@ -33,7 +32,7 @@ public static class SyncValidators
 	{
 		ActionResult result = new OkResult();
 
-		if (request.IsNull("Request", out var error))
+		if (request.IsNull("Request", out ErrorResponse? error))
 			return (false, new BadRequestObjectResult(error));
 
 		if (settings.Garmin.Upload && settings.Garmin.TwoStepVerificationEnabled)

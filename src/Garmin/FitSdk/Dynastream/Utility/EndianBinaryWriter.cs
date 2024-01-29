@@ -13,18 +13,16 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using System.IO;
 
 namespace Dynastream.Utility
 {
-    /// <summary>
-    /// Extend framework BinaryWriter to support BigEndian destinations.
-    /// When writing multibyte values, the bytes are reordered appropriately.
-    /// </summary>
-    public class EndianBinaryWriter : BinaryWriter
+	/// <summary>
+	/// Extend framework BinaryWriter to support BigEndian destinations.
+	/// When writing multibyte values, the bytes are reordered appropriately.
+	/// </summary>
+	public class EndianBinaryWriter : BinaryWriter
     {
         #region Fields
         private bool isBigEndian = false;

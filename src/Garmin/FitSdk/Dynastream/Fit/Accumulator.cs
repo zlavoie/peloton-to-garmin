@@ -12,14 +12,11 @@
 
 #endregion
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Dynastream.Fit
 {
-    public class Accumulator
+	public class Accumulator
     {
         List<AccumulatedField> accumulatedFields;
 

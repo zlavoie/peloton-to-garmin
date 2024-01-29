@@ -13,18 +13,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the DiveApneaAlarm profile message.
-    /// </summary>
-    public class DiveApneaAlarmMesg : Mesg
+	/// <summary>
+	/// Implements the DiveApneaAlarm profile message.
+	/// </summary>
+	public class DiveApneaAlarmMesg : Mesg
     {
         #region Fields
         #endregion

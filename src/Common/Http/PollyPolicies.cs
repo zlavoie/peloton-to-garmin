@@ -5,7 +5,6 @@ using System.Net.Http;
 using Flurl.Http;
 using Serilog;
 using Polly.NoOp;
-using Polly.RateLimit;
 
 namespace Common.Http;
 

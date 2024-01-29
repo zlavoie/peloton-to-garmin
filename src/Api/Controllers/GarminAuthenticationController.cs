@@ -2,6 +2,7 @@
 using Api.Service.Helpers;
 using Common.Service;
 using Garmin.Auth;
+using Garmin.Auth.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -26,7 +27,7 @@ namespace Api.Controllers
 		public async Task<ActionResult<GarminAuthenticationGetResponse>> GetAsync()
 		{
 			var settings = await _settingsService.GetSettingsAsync();
-			var auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
+			Common.Stateful.GarminApiAuthentication auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
 
 			var result = new GarminAuthenticationGetResponse() { IsAuthenticated = auth?.IsValid(settings) ?? false };
 			return Ok(result);
@@ -47,25 +48,23 @@ namespace Api.Controllers
 		{
 			var settings = await _settingsService.GetSettingsAsync();
 
-			if (settings.Garmin.Password.CheckIsNullOrEmpty("Garmin Password", out var result)) return BadRequest(result);
+			if (settings.Garmin.Password.CheckIsNullOrEmpty("Garmin Password", out ErrorResponse? result)) return BadRequest(result);
 			if (settings.Garmin.Email.CheckIsNullOrEmpty("Garmin Email", out result)) return BadRequest(result);
 
 			try
-			{ 
+			{
 				if (!settings.Garmin.TwoStepVerificationEnabled)
 				{
 					await _garminAuthService.RefreshGarminAuthenticationAsync();
 					return Created("api/garminauthentication", new GarminAuthenticationGetResponse() { IsAuthenticated = true });
 				}
-				else
-				{
-					var auth = await _garminAuthService.RefreshGarminAuthenticationAsync();
 
-					if (auth.AuthStage == Common.Stateful.AuthStage.NeedMfaToken)
-						return Accepted();
+				Common.Stateful.GarminApiAuthentication auth = await _garminAuthService.RefreshGarminAuthenticationAsync();
 
-					return Created("api/garminauthentication", new GarminAuthenticationGetResponse() { IsAuthenticated = true });
-				}
+				if (auth.AuthStage == Common.Stateful.AuthStage.NeedMfaToken)
+					return Accepted();
+
+				return Created("api/garminauthentication", new GarminAuthenticationGetResponse() { IsAuthenticated = true });
 			}
 			catch (GarminAuthenticationError gae) when (gae.Code == Code.UnexpectedMfa)
 			{

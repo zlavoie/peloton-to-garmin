@@ -23,7 +23,7 @@ public class TcxConverter : Converter<XElement>
 
 	protected override void Save(XElement data, string path)
 	{
-		using var tracing = Tracing.Trace($"{nameof(TcxConverter)}.{nameof(Save)}")
+		using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(TcxConverter)}.{nameof(Save)}")
 							.WithTag(TagKey.Format, FileFormat.Tcx.ToString());
 
 		data.Save(path);
@@ -31,13 +31,13 @@ public class TcxConverter : Converter<XElement>
 
 	protected override async Task<XElement> ConvertInternalAsync(P2GWorkout workoutData, Settings settings)
 	{
-		using var tracing = Tracing.Trace($"{nameof(TcxConverter)}.{nameof(ConvertAsync)}")
+		using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(TcxConverter)}.{nameof(ConvertAsync)}")
 							.WithTag(TagKey.Format, FileFormat.Tcx.ToString())
 							.WithWorkoutId(workoutData.Workout.Id);
 
-		var workout = workoutData.Workout;
-		var samples = workoutData.WorkoutSamples;
-		var userData = workoutData.UserData;
+		Workout workout = workoutData.Workout;
+		WorkoutSamples samples = workoutData.WorkoutSamples;
+		UserData userData = workoutData.UserData;
 
 		XNamespace ns1 = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2";
 		XNamespace activityExtensions = "http://www.garmin.com/xmlschemas/ActivityExtension/v2";
@@ -45,15 +45,15 @@ public class TcxConverter : Converter<XElement>
 		XNamespace profileExtension = "http://www.garmin.com/xmlschemas/ProfileExtension/v1";
 		XNamespace xsi = XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance");
 
-		var sport = GetSport(workout);
-		var subSport = GetSubSport(workout);
-		var startTime = GetStartTimeUtc(workout);
+		string sport = GetSport(workout);
+		string subSport = GetSubSport(workout);
+		System.DateTime startTime = GetStartTimeUtc(workout);
 
-		var outputSummary = GetOutputSummary(samples);
-		var hrSummary = GetHeartRateSummary(samples);
-		var cadenceSummary = GetCadenceSummary(samples, GetGarminSport(workout));
-		var resistanceSummary = GetResistanceSummary(samples);
-		var deviceInfo = await GetDeviceInfoAsync(workout.Fitness_Discipline, settings);
+		Metric outputSummary = GetOutputSummary(samples);
+		Metric hrSummary = GetHeartRateSummary(samples);
+		Metric cadenceSummary = GetCadenceSummary(samples, GetGarminSport(workout));
+		Metric resistanceSummary = GetResistanceSummary(samples);
+		Common.Dto.Garmin.GarminDeviceInfo deviceInfo = await GetDeviceInfoAsync(workout.Fitness_Discipline, settings);
 
 		var lx = new XElement(activityExtensions + "TPX");
 		lx.Add(new XElement(activityExtensions + "TotalPower", workout?.Total_Work));
@@ -68,15 +68,15 @@ public class TcxConverter : Converter<XElement>
 		extensions.Add(lx);
 
 		var track = new XElement(ns1+"Track");
-		var allMetrics = samples.Metrics;
-		var hrMetrics = allMetrics.FirstOrDefault(m => m.Slug == "heart_rate");
-		var outputMetrics = allMetrics.FirstOrDefault(m => m.Slug == "output");
-		var cadenceMetrics = allMetrics.FirstOrDefault(m => m.Slug == "cadence");
-		var speedMetrics = GetSpeedSummary(samples);
-		var resistanceMetrics = allMetrics.FirstOrDefault(m => m.Slug == "resistance");
-		var locationMetrics = samples.Location_Data?.SelectMany(x => x.Coordinates).ToArray();
-		var altitudeMetrics = allMetrics.FirstOrDefault(m => m.Slug == "altitude");
-		for (var i = 0; i < samples.Seconds_Since_Pedaling_Start.Count; i++)
+		System.Collections.Generic.ICollection<Metric> allMetrics = samples.Metrics;
+		Metric hrMetrics = allMetrics.FirstOrDefault(m => m.Slug == "heart_rate");
+		Metric outputMetrics = allMetrics.FirstOrDefault(m => m.Slug == "output");
+		Metric cadenceMetrics = allMetrics.FirstOrDefault(m => m.Slug == "cadence");
+		Metric speedMetrics = GetSpeedSummary(samples);
+		Metric resistanceMetrics = allMetrics.FirstOrDefault(m => m.Slug == "resistance");
+		Coordinate[] locationMetrics = samples.Location_Data?.SelectMany(x => x.Coordinates).ToArray();
+		Metric altitudeMetrics = allMetrics.FirstOrDefault(m => m.Slug == "altitude");
+		for (int i = 0; i < samples.Seconds_Since_Pedaling_Start.Count; i++)
 		{
 			var trackPoint = new XElement(ns1+"TrackPoint");
 

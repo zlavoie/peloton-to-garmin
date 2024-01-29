@@ -1,6 +1,5 @@
 ﻿using Api.Contract;
 using Api.Controllers;
-using Common;
 using Common.Dto;
 using Common.Service;
 using Common.Stateful;
@@ -25,16 +24,16 @@ namespace UnitTests.Api.Controllers
 		public async Task SyncAsync_With_NullRequest_Returns400()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<SyncController>();
+			SyncController controller = autoMocker.CreateInstance<SyncController>();
 
-			var settings = autoMocker.GetMock<ISettingsService>();
+			Mock<ISettingsService> settings = autoMocker.GetMock<ISettingsService>();
 			settings.SetupWithAny<ISettingsService, Task<Settings>>(nameof(settings.Object.GetSettingsAsync))
 				.ReturnsAsync(new Settings());
 
 			settings.SetupWithAny<ISettingsService, GarminApiAuthentication>(nameof(settings.Object.GetGarminAuthentication))
 				.Returns((GarminApiAuthentication)null);
 
-			var response = await controller.SyncAsync(null);
+			ActionResult<SyncPostResponse> response = await controller.SyncAsync(null);
 
 			var result = response.Result as BadRequestObjectResult;
 			result.Should().NotBeNull();
@@ -46,8 +45,8 @@ namespace UnitTests.Api.Controllers
 		public async Task SyncAsync_With_DefaultRequest_Returns400()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<SyncController>();
-			var settings = autoMocker.GetMock<ISettingsService>();
+			SyncController controller = autoMocker.CreateInstance<SyncController>();
+			Mock<ISettingsService> settings = autoMocker.GetMock<ISettingsService>();
 
 			settings.SetupWithAny<ISettingsService, Task<Settings>>(nameof(settings.Object.GetSettingsAsync))
 				.ReturnsAsync(new Settings());
@@ -57,7 +56,7 @@ namespace UnitTests.Api.Controllers
 
 			var request = new SyncPostRequest();
 
-			var response = await controller.SyncAsync(request);
+			ActionResult<SyncPostResponse> response = await controller.SyncAsync(request);
 
 			var result = response.Result as BadRequestObjectResult;
 			result.Should().NotBeNull();
@@ -69,8 +68,8 @@ namespace UnitTests.Api.Controllers
 		public async Task SyncAsync_With_EmptyWorkoutIdsRequest_Returns400()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<SyncController>();
-			var settings = autoMocker.GetMock<ISettingsService>();
+			SyncController controller = autoMocker.CreateInstance<SyncController>();
+			Mock<ISettingsService> settings = autoMocker.GetMock<ISettingsService>();
 
 			settings.SetupWithAny<ISettingsService, Task<Settings>>(nameof(settings.Object.GetSettingsAsync))
 				.ReturnsAsync(new Settings());
@@ -80,7 +79,7 @@ namespace UnitTests.Api.Controllers
 
 			var request = new SyncPostRequest() { WorkoutIds = new List<string>() };
 
-			var response = await controller.SyncAsync(request);
+			ActionResult<SyncPostResponse> response = await controller.SyncAsync(request);
 
 			var result = response.Result as BadRequestObjectResult;
 			result.Should().NotBeNull();
@@ -92,8 +91,8 @@ namespace UnitTests.Api.Controllers
 		public async Task SyncAsync_WhenGarminMfaEnabled_AndNoAuthTokenYet_Returns401()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<SyncController>();
-			var settings = autoMocker.GetMock<ISettingsService>();
+			SyncController controller = autoMocker.CreateInstance<SyncController>();
+			Mock<ISettingsService> settings = autoMocker.GetMock<ISettingsService>();
 
 			settings.SetupWithAny<ISettingsService, Task<Settings>>(nameof(settings.Object.GetSettingsAsync))
 				.ReturnsAsync(new Settings() { Garmin = new() { Upload = true, TwoStepVerificationEnabled = true } });
@@ -103,7 +102,7 @@ namespace UnitTests.Api.Controllers
 
 			var request = new SyncPostRequest() { WorkoutIds = new List<string>() { "someId" } };
 
-			var response = await controller.SyncAsync(request);
+			ActionResult<SyncPostResponse> response = await controller.SyncAsync(request);
 
 			var result = response.Result as UnauthorizedObjectResult;
 			result.Should().NotBeNull();
@@ -116,9 +115,9 @@ namespace UnitTests.Api.Controllers
 		public async Task SyncAsync_WorkoutIds_Calls_CorrectMethod()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<SyncController>();
-			var service = autoMocker.GetMock<ISyncService>();
-			var settings = autoMocker.GetMock<ISettingsService>();
+			SyncController controller = autoMocker.CreateInstance<SyncController>();
+			Mock<ISyncService> service = autoMocker.GetMock<ISyncService>();
+			Mock<ISettingsService> settings = autoMocker.GetMock<ISettingsService>();
 
 			settings.SetupWithAny<ISettingsService, Task<Settings>>(nameof(settings.Object.GetSettingsAsync))
 				.ReturnsAsync(new Settings());
@@ -127,7 +126,7 @@ namespace UnitTests.Api.Controllers
 
 			var request = new SyncPostRequest() { WorkoutIds = new List<string>() { "someId" } };
 
-			var actionResult = await controller.SyncAsync(request);
+			ActionResult<SyncPostResponse> actionResult = await controller.SyncAsync(request);
 
 			var response = actionResult.Result as CreatedResult;
 			response.Should().NotBeNull();
@@ -139,9 +138,9 @@ namespace UnitTests.Api.Controllers
 		public async Task SyncAsync_When_Service_Throws_Exception_Returns_BadRequest()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<SyncController>();
-			var service = autoMocker.GetMock<ISyncService>();
-			var settings = autoMocker.GetMock<ISettingsService>();
+			SyncController controller = autoMocker.CreateInstance<SyncController>();
+			Mock<ISyncService> service = autoMocker.GetMock<ISyncService>();
+			Mock<ISettingsService> settings = autoMocker.GetMock<ISettingsService>();
 
 			settings.SetupWithAny<ISettingsService, Task<Settings>>(nameof(settings.Object.GetSettingsAsync))
 				.ReturnsAsync(new Settings());
@@ -151,7 +150,7 @@ namespace UnitTests.Api.Controllers
 
 			var request = new SyncPostRequest() { WorkoutIds = new List<string>() { "someId" } };
 
-			var actionResult = await controller.SyncAsync(request);
+			ActionResult<SyncPostResponse> actionResult = await controller.SyncAsync(request);
 
 			var result = actionResult.Result as ObjectResult;
 			result.Should().NotBeNull();
@@ -164,9 +163,9 @@ namespace UnitTests.Api.Controllers
 		public async Task SyncAsync_When_SyncUnsuccessful_OkResult_Returned()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<SyncController>();
-			var service = autoMocker.GetMock<ISyncService>();
-			var settings = autoMocker.GetMock<ISettingsService>();
+			SyncController controller = autoMocker.CreateInstance<SyncController>();
+			Mock<ISyncService> service = autoMocker.GetMock<ISyncService>();
+			Mock<ISettingsService> settings = autoMocker.GetMock<ISettingsService>();
 
 			settings.SetupWithAny<ISettingsService, Task<Settings>>(nameof(settings.Object.GetSettingsAsync))
 				.ReturnsAsync(new Settings());
@@ -175,7 +174,7 @@ namespace UnitTests.Api.Controllers
 
 			var request = new SyncPostRequest() { WorkoutIds = new List<string>() { "someId" } };
 
-			var actionResult = await controller.SyncAsync(request);
+			ActionResult<SyncPostResponse> actionResult = await controller.SyncAsync(request);
 
 			var response = actionResult.Result as OkObjectResult;
 			response.Should().NotBeNull();
@@ -188,9 +187,9 @@ namespace UnitTests.Api.Controllers
 		public async Task SyncAsync_When_SyncSuccessful_CreatedResult_Returned()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<SyncController>();
-			var service = autoMocker.GetMock<ISyncService>();
-			var settings = autoMocker.GetMock<ISettingsService>();
+			SyncController controller = autoMocker.CreateInstance<SyncController>();
+			Mock<ISyncService> service = autoMocker.GetMock<ISyncService>();
+			Mock<ISettingsService> settings = autoMocker.GetMock<ISettingsService>();
 
 			settings.SetupWithAny<ISettingsService, Task<Settings>>(nameof(settings.Object.GetSettingsAsync))
 				.ReturnsAsync(new Settings());
@@ -205,7 +204,7 @@ namespace UnitTests.Api.Controllers
 
 			var request = new SyncPostRequest() { WorkoutIds = new List<string>() { "someId" } };
 
-			var actionResult = await controller.SyncAsync(request);
+			ActionResult<SyncPostResponse> actionResult = await controller.SyncAsync(request);
 
 			var response = actionResult.Result as CreatedResult;
 			response.Should().NotBeNull();
@@ -222,9 +221,9 @@ namespace UnitTests.Api.Controllers
 		public async Task SyncAsync_When_SyncErrors_MapsErrorsCorrectly()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<SyncController>();
-			var service = autoMocker.GetMock<ISyncService>();
-			var settings = autoMocker.GetMock<ISettingsService>();
+			SyncController controller = autoMocker.CreateInstance<SyncController>();
+			Mock<ISyncService> service = autoMocker.GetMock<ISyncService>();
+			Mock<ISettingsService> settings = autoMocker.GetMock<ISettingsService>();
 
 			settings.SetupWithAny<ISettingsService, Task<Settings>>(nameof(settings.Object.GetSettingsAsync))
 				.ReturnsAsync(new Settings());
@@ -240,7 +239,7 @@ namespace UnitTests.Api.Controllers
 
 			var request = new SyncPostRequest() { WorkoutIds = new List<string>() { "someId" } };
 
-			var actionResult = await controller.SyncAsync(request);
+			ActionResult<SyncPostResponse> actionResult = await controller.SyncAsync(request);
 
 			var response = actionResult.Result as OkObjectResult;
 			response.Should().NotBeNull();

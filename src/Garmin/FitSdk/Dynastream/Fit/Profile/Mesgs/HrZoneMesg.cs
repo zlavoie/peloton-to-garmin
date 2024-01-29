@@ -13,18 +13,15 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
-using System.IO;
 using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the HrZone profile message.
-    /// </summary>
-    public class HrZoneMesg : Mesg
+	/// <summary>
+	/// Implements the HrZone profile message.
+	/// </summary>
+	public class HrZoneMesg : Mesg
     {
         #region Fields
         #endregion

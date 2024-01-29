@@ -13,17 +13,14 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using System.IO;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements .FIT header encode/decode.
-    /// </summary>
-    public class Header
+	/// <summary>
+	/// Implements .FIT header encode/decode.
+	/// </summary>
+	public class Header
     {
         #region Fields
         private char[] dataType;

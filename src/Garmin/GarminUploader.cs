@@ -1,9 +1,7 @@
-﻿using Common;
-using Common.Dto;
+﻿using Common.Dto;
 using Common.Observe;
 using Common.Service;
 using Common.Stateful;
-using Garmin.Auth;
 using Prometheus;
 using Serilog;
 using System;
@@ -46,7 +44,7 @@ namespace Garmin
 
 		public async Task UploadToGarminAsync()
 		{
-			using var tracing = Tracing.Trace($"{nameof(GarminUploader)}.{nameof(UploadToGarminAsync)}");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(GarminUploader)}.{nameof(UploadToGarminAsync)}");
 
 			var settings = await _settingsService.GetSettingsAsync();
 
@@ -60,7 +58,7 @@ namespace Garmin
 				return;
 			}
 
-			var files = Directory.GetFiles(settings.App.UploadDirectory);
+			string[] files = Directory.GetFiles(settings.App.UploadDirectory);
 			tracing?.AddTag("workouts.count", files.Length);
 
 			if (files.Length == 0)
@@ -69,7 +67,7 @@ namespace Garmin
 				return;
 			}
 
-			using var metrics = WorkoutUploadDuration
+			using ITimer metrics = WorkoutUploadDuration
 								.WithLabels(files.Count().ToString()).NewTimer();
 
 			await UploadAsync(files, settings);
@@ -78,13 +76,13 @@ namespace Garmin
 
 		private async Task UploadAsync(string[] files, Settings settings)
 		{
-			using var tracing = Tracing.Trace($"{nameof(GarminUploader)}.{nameof(UploadAsync)}.UploadToGarminViaNative")?
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(GarminUploader)}.{nameof(UploadAsync)}.UploadToGarminViaNative")?
 										.WithTag(TagKey.Category, "nativeImplV1")
 										.AddTag("workouts.count", files.Count());
 
 			var auth = await _authService.GetGarminAuthenticationAsync();
 
-			foreach (var file in files)
+			foreach (string file in files)
 			{
 				try
 				{
@@ -100,9 +98,9 @@ namespace Garmin
 
 		private async Task RateLimit()
 		{
-			using var tracing = Tracing.Trace($"{nameof(GarminUploader)}.{nameof(RateLimit)}");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(GarminUploader)}.{nameof(RateLimit)}");
 
-			var waitDuration = _random.Next(1000, 5000);
+			int waitDuration = _random.Next(1000, 5000);
 			_logger.Information($"Rate limiting, upload will continue after {waitDuration / 1000} seconds...");
 			tracing?.AddTag("rate.limit.sec", waitDuration);
 			await Task.Delay(waitDuration);

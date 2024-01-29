@@ -26,32 +26,32 @@ public class AnnualChallengeService : IAnnualChallengeService
 		var result = new ServiceResult<AnnualChallengeProgress>();
 		result.Result = new AnnualChallengeProgress();
 
-		var joinedChallenges = await _pelotonApi.GetJoinedChallengesAsync(userId);
+		PelotonChallenges joinedChallenges = await _pelotonApi.GetJoinedChallengesAsync(userId);
 		if (joinedChallenges == null || joinedChallenges.Challenges.Length <= 0)
 			return result;
 
-		var annualChallenge = joinedChallenges.Challenges.FirstOrDefault(c => c.Challenge_Summary.Id == AnnualChallengeId || c.Challenge_Summary.Title.StartsWith("The Annual"));
+		PelotonChallenge annualChallenge = joinedChallenges.Challenges.FirstOrDefault(c => c.Challenge_Summary.Id == AnnualChallengeId || c.Challenge_Summary.Title.StartsWith("The Annual"));
 		if (annualChallenge is null)
 			return result;
 
-		var annualChallengeProgressDetail = await _pelotonApi.GetUserChallengeDetailsAsync(userId, AnnualChallengeId);
+		PelotonUserChallengeDetail annualChallengeProgressDetail = await _pelotonApi.GetUserChallengeDetailsAsync(userId, AnnualChallengeId);
 		if (annualChallengeProgressDetail is null)
 			return result;
 
-		var tiers = annualChallengeProgressDetail.Challenge_Detail.Tiers;
-		var progress = annualChallengeProgressDetail.Progress;
+		PelotonChallengeTier[] tiers = annualChallengeProgressDetail.Challenge_Detail.Tiers;
+		ChallengeProgress progress = annualChallengeProgressDetail.Progress;
 
-		var now = DateTime.UtcNow;
-		var startTimeUtc = DateTimeOffset.FromUnixTimeSeconds(annualChallengeProgressDetail.Challenge_Summary.Start_Time).UtcDateTime;
-		var endTimeUtc = DateTimeOffset.FromUnixTimeSeconds(annualChallengeProgressDetail.Challenge_Summary.End_Time).UtcDateTime;
+		DateTime now = DateTime.UtcNow;
+		DateTime startTimeUtc = DateTimeOffset.FromUnixTimeSeconds(annualChallengeProgressDetail.Challenge_Summary.Start_Time).UtcDateTime;
+		DateTime endTimeUtc = DateTimeOffset.FromUnixTimeSeconds(annualChallengeProgressDetail.Challenge_Summary.End_Time).UtcDateTime;
 
 		result.Result.HasJoined = true;
 		result.Result.EarnedMinutes = progress.Metric_Value;
 		result.Result.Tiers = tiers.Where(t => t.Metric_Value > 0).Select(t => 
 		{
-			var requiredMinutes = t.Metric_Value;
-			var actualMinutes = progress.Metric_Value;
-			var onTrackDetails = CalculateOnTrackDetails(now, startTimeUtc, endTimeUtc, actualMinutes, requiredMinutes);
+			double requiredMinutes = t.Metric_Value;
+			double actualMinutes = progress.Metric_Value;
+			OnTrackDetails onTrackDetails = CalculateOnTrackDetails(now, startTimeUtc, endTimeUtc, actualMinutes, requiredMinutes);
 
 			return new Tier()
 			{
@@ -75,18 +75,18 @@ public class AnnualChallengeService : IAnnualChallengeService
 
 	public static OnTrackDetails CalculateOnTrackDetails(DateTime now, DateTime startTimeUtc, DateTime endTimeUtc, double earnedMinutes, double requiredMinutes)
 	{
-		var totalTime = endTimeUtc - startTimeUtc;
-		var totalDays = Math.Ceiling(totalTime.TotalDays);
+		TimeSpan totalTime = endTimeUtc - startTimeUtc;
+		double totalDays = Math.Ceiling(totalTime.TotalDays);
 
-		var minutesNeededPerDay = requiredMinutes / totalDays;
+		double minutesNeededPerDay = requiredMinutes / totalDays;
 
-		var elapsedTime = now - startTimeUtc;
-		var elapsedDays = Math.Ceiling(elapsedTime.TotalDays);
+		TimeSpan elapsedTime = now - startTimeUtc;
+		double elapsedDays = Math.Ceiling(elapsedTime.TotalDays);
 
-		var neededMinutesToBeOnTrack = elapsedDays * minutesNeededPerDay;
+		double neededMinutesToBeOnTrack = elapsedDays * minutesNeededPerDay;
 
-		var remainingDays = Math.Ceiling((endTimeUtc - now).TotalDays);
-		var minutesNeededPerDayToFinishOnTime = (requiredMinutes - earnedMinutes) / remainingDays;
+		double remainingDays = Math.Ceiling((endTimeUtc - now).TotalDays);
+		double minutesNeededPerDayToFinishOnTime = (requiredMinutes - earnedMinutes) / remainingDays;
 
 		return new OnTrackDetails()
 		{

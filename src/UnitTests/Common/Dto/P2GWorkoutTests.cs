@@ -17,7 +17,7 @@ public class P2GWorkoutTests
 			WorkoutSamples = new WorkoutSamples() { Location_Data = isOutdoor ? new List<LocationData>() { new LocationData() } : null }
 		};
 
-		var workoutType = workout.WorkoutType;
+		WorkoutType workoutType = workout.WorkoutType;
 
 			switch (fitnessDiscipline)
 			{

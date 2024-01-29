@@ -12,7 +12,7 @@ namespace Conversion
 
 		public static void Decode(string filePath)
 		{
-			using var tracing = Tracing.Trace($"{nameof(FitConverter)}.{nameof(Decode)}")
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(FitConverter)}.{nameof(Decode)}")
 										.WithTag(TagKey.Format, FileFormat.Fit.ToString());
 
 			Decode decoder = new Decode();
@@ -119,7 +119,7 @@ namespace Conversion
 		private static void Write(object sender, MesgEventArgs e)
 		{
 			_logger.Verbose($"{e.mesg.Name}::");
-			foreach(var f in e.mesg.Fields)
+			foreach(Field f in e.mesg.Fields)
 			{
 				_logger.Verbose($"{f.GetName()}::{f.GetValue()}");
 			}
@@ -130,18 +130,18 @@ namespace Conversion
 				_logger.Verbose($"FOUND DEV FIELD - {dev.Name} {dev.Num}");
 				foreach(DeveloperField devField in dev.DeveloperFields)
 				{
-					var name = devField.Name;
-					var value = devField.GetValue();
-					var units = devField.GetUnits();
-					var isResistance = devField.NativeOverride == RecordMesg.FieldDefNum.Resistance;
+					string name = devField.Name;
+					object value = devField.GetValue();
+					string units = devField.GetUnits();
+					bool isResistance = devField.NativeOverride == RecordMesg.FieldDefNum.Resistance;
 					_logger.Verbose($"DevFields: {name} {value} {units} isResistance:{isResistance}");
 				}
 
 				foreach(Field devField in dev.Fields)
 				{
-					var name = devField.Name;
-					var value = devField.GetValue();
-					var units = devField.GetUnits();
+					string name = devField.Name;
+					object value = devField.GetValue();
+					string units = devField.GetUnits();
 					_logger.Verbose($"Fields: {name} {value} {units}");
 				}
 			}

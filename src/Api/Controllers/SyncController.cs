@@ -41,9 +41,9 @@ public class SyncController : Controller
 	public async Task<ActionResult<SyncPostResponse>> SyncAsync([FromBody] SyncPostRequest request)
 	{
 		var settings = await _settingsService.GetSettingsAsync();
-		var auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
+		Common.Stateful.GarminApiAuthentication auth = _settingsService.GetGarminAuthentication(settings.Garmin.Email);
 
-		var (isValid, result) = request.IsValidHttp(settings, auth);
+		(bool isValid, ActionResult result) = request.IsValidHttp(settings, auth);
 		if (!isValid) return result!;
 
 		SyncResult syncResult = new();
@@ -80,12 +80,12 @@ public class SyncController : Controller
 	[ProducesResponseType(typeof(SyncGetResponse), 200)]
 	public async Task<ActionResult<SyncGetResponse>> GetAsync()
 	{
-		var syncTimeTask = _db.GetSyncStatusAsync();
+		Task<SyncServiceStatus> syncTimeTask = _db.GetSyncStatusAsync();
 		var settingsTask = _settingsService.GetSettingsAsync();
 
 		await Task.WhenAll(syncTimeTask, settingsTask);
 
-		var syncTime = await syncTimeTask;
+		SyncServiceStatus syncTime = await syncTimeTask;
 		var settings = await settingsTask;
 
 		var response = new SyncGetResponse()

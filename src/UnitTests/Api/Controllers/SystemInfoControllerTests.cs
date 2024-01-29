@@ -18,8 +18,8 @@ public class SystemInfoControllerTests
 	{
 		// SETUP
 		var autoMocker = new AutoMocker();
-		var controller = autoMocker.CreateInstance<SystemInfoController>();
-		var service = autoMocker.GetMock<ISystemInfoService>();
+		SystemInfoController controller = autoMocker.CreateInstance<SystemInfoController>();
+		Mock<ISystemInfoService> service = autoMocker.GetMock<ISystemInfoService>();
 
 		service.SetupWithAny<ISystemInfoService, Task<SystemInfoGetResponse>>(nameof(service.Object.GetAsync))
 			.ReturnsAsync(new SystemInfoGetResponse());
@@ -35,7 +35,7 @@ public class SystemInfoControllerTests
 		var request = new SystemInfoGetRequest() { CheckForUpdate = false };
 
 		// ACT
-		var actionResult = await controller.GetAsync(request);
+		ActionResult<SystemInfoGetResponse> actionResult = await controller.GetAsync(request);
 
 		// ASSERT
 		var response = actionResult.Result as OkObjectResult;

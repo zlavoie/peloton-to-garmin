@@ -32,28 +32,28 @@ namespace Common.Service
 
 		public void ClearGarminAuthentication(string garminEmail)
 		{
-			using var tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(ClearGarminAuthentication)}");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(ClearGarminAuthentication)}");
 
 			_next.ClearGarminAuthentication(garminEmail);
 		}
 
 		public void ClearPelotonApiAuthentication(string pelotonEmail)
 		{
-			using var tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(ClearPelotonApiAuthentication)}");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(ClearPelotonApiAuthentication)}");
 
 			_next.ClearPelotonApiAuthentication(pelotonEmail);
 		}
 
 		public GarminApiAuthentication GetGarminAuthentication(string garminEmail)
 		{
-			using var tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(GetGarminAuthentication)}");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(GetGarminAuthentication)}");
 
 			return _next.GetGarminAuthentication(garminEmail);
 		}
 
 		public PelotonApiAuthentication GetPelotonApiAuthentication(string pelotonEmail)
 		{
-			using var tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(GetPelotonApiAuthentication)}");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(GetPelotonApiAuthentication)}");
 
 			return _next.GetPelotonApiAuthentication(pelotonEmail);
 		}
@@ -68,45 +68,45 @@ namespace Common.Service
 
 		public void SetGarminAuthentication(GarminApiAuthentication authentication)
 		{
-			using var tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(SetGarminAuthentication)}");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(SetGarminAuthentication)}");
 
 			_next.SetGarminAuthentication(authentication);
 		}
 
 		public void SetPelotonApiAuthentication(PelotonApiAuthentication authentication)
 		{
-			using var tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(SetPelotonApiAuthentication)}");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(SetPelotonApiAuthentication)}");
 
 			_next.SetPelotonApiAuthentication(authentication);
 		}
 
-		public Task UpdateSettingsAsync(Settings settings)
+		public Task<Settings> UpdateSettingsAsync(Settings settings)
 		{
 			throw new NotImplementedException();
 		}
 
 		public Task<AppConfiguration> GetAppConfigurationAsync()
 		{
-			using var tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(GetAppConfigurationAsync)}");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(GetAppConfigurationAsync)}");
 
 			return _next.GetAppConfigurationAsync();
 		}
 
 		public async Task<GarminDeviceInfo> GetCustomDeviceInfoAsync(string garminEmail)
 		{
-			using var tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(GetCustomDeviceInfoAsync)}");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(FileBasedSettingsService)}.{nameof(GetCustomDeviceInfoAsync)}");
 
 			GarminDeviceInfo userProvidedDeviceInfo = null;
 
-			var settings = await GetSettingsAsync();
-			var userDevicePath = settings.Format.DeviceInfoPath;
+			Settings settings = await GetSettingsAsync();
+			string userDevicePath = settings.Format.DeviceInfoPath;
 
 			if (string.IsNullOrEmpty(userDevicePath))
 				return null;
 
 			lock (_lock)
 			{
-				var key = $"{GarminDeviceInfoKey}:{garminEmail}";
+				string key = $"{GarminDeviceInfoKey}:{garminEmail}";
 				return _cache.GetOrCreate(key, (cacheEntry) =>
 				{
 					cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(5);

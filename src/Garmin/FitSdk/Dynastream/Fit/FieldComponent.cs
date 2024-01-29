@@ -12,18 +12,12 @@
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-
 namespace Dynastream.Fit
 {
-    /// <summary>
-    ///
-    /// </summary>
-    internal class FieldComponent
+	/// <summary>
+	///
+	/// </summary>
+	internal class FieldComponent
     {
         #region Fields
         internal byte fieldNum;

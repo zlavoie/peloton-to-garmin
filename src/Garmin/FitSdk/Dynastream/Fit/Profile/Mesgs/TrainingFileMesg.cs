@@ -13,18 +13,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the TrainingFile profile message.
-    /// </summary>
-    public class TrainingFileMesg : Mesg
+	/// <summary>
+	/// Implements the TrainingFile profile message.
+	/// </summary>
+	public class TrainingFileMesg : Mesg
     {
         #region Fields
         static class ProductSubfield

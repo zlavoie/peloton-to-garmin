@@ -13,18 +13,15 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
-using System.IO;
 using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the SpeedZone profile message.
-    /// </summary>
-    public class SpeedZoneMesg : Mesg
+	/// <summary>
+	/// Implements the SpeedZone profile message.
+	/// </summary>
+	public class SpeedZoneMesg : Mesg
     {
         #region Fields
         #endregion

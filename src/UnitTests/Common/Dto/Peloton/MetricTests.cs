@@ -10,9 +10,9 @@ namespace UnitTests.Common.Dto.Peloton
 		[Test]
 		public void Json_Can_Deserialzize_To_Metric()
 		{
-			var sampleMetricPayload = "{ \"display_name\": \"Pace\", \"display_unit\": \"min/mi\",\"max_value\": 14.63,\"average_value\": 18.02,\"Values\": [null, -1, 10, 12]}";
+			string sampleMetricPayload = "{ \"display_name\": \"Pace\", \"display_unit\": \"min/mi\",\"max_value\": 14.63,\"average_value\": 18.02,\"Values\": [null, -1, 10, 12]}";
 
-			var metric = JsonSerializer.Deserialize<Metric>(sampleMetricPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+			Metric metric = JsonSerializer.Deserialize<Metric>(sampleMetricPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 			metric.Values.Should().NotBeNullOrEmpty();
 			metric.Values.Length.Should().Be(4);
 			metric.Values.GetValue(0).Should().BeNull();
@@ -25,9 +25,9 @@ namespace UnitTests.Common.Dto.Peloton
 		[Test]
 		public void Json_WithNullMaxVlaue_Can_Deserialzize_To_Metric()
 		{
-			var sampleMetricPayload = "{ \"display_name\": \"Pace\", \"display_unit\": \"min/mi\",\"max_value\": null,\"average_value\": 18.02,\"Values\": [-1, 10, 12]}";
+			string sampleMetricPayload = "{ \"display_name\": \"Pace\", \"display_unit\": \"min/mi\",\"max_value\": null,\"average_value\": 18.02,\"Values\": [-1, 10, 12]}";
 
-			var metric = JsonSerializer.Deserialize<Metric>(sampleMetricPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+			Metric metric = JsonSerializer.Deserialize<Metric>(sampleMetricPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 			metric.Values.Should().NotBeNullOrEmpty();
 			metric.Max_Value.Should().BeNull();
 		}
@@ -35,9 +35,9 @@ namespace UnitTests.Common.Dto.Peloton
 		[Test]
 		public void Json_WithNullAvgVlaue_Can_Deserialzize_To_Metric()
 		{
-			var sampleMetricPayload = "{ \"display_name\": \"Pace\", \"display_unit\": \"min/mi\",\"max_value\": 1,\"average_value\": null,\"Values\": [-1, 10, 12]}";
+			string sampleMetricPayload = "{ \"display_name\": \"Pace\", \"display_unit\": \"min/mi\",\"max_value\": 1,\"average_value\": null,\"Values\": [-1, 10, 12]}";
 
-			var metric = JsonSerializer.Deserialize<Metric>(sampleMetricPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+			Metric metric = JsonSerializer.Deserialize<Metric>(sampleMetricPayload, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 			metric.Values.Should().NotBeNullOrEmpty();
 			metric.Average_Value.Should().BeNull();
 		}

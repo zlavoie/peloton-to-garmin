@@ -14,7 +14,7 @@ public class TcxConverterTests
 	public void Converter_Should_Provide_Formt_of_TCX()
 	{
 		var mocker = new AutoMocker();
-		var converter = mocker.CreateInstance<TcxConverterInstance>();
+		TcxConverterInstance converter = mocker.CreateInstance<TcxConverterInstance>();
 
 		converter.Format.Should().Be(FileFormat.Tcx);
 	}
@@ -23,7 +23,7 @@ public class TcxConverterTests
 	public void ShouldConvert_ShouldOnly_Support_TCX([Values] bool tcx, [Values] bool json, [Values] bool fit)
 	{
 		var mocker = new AutoMocker();
-		var converter = mocker.CreateInstance<TcxConverterInstance>();
+		TcxConverterInstance converter = mocker.CreateInstance<TcxConverterInstance>();
 
 		var formatSettings = new Format()
 		{

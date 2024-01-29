@@ -121,8 +121,8 @@ namespace Garmin
 
 		public async Task<UploadResponse> UploadActivity(string filePath, string format, GarminApiAuthentication auth)
 		{
-			var fileName = Path.GetFileName(filePath);
-			var response = await $"{UPLOAD_URL}/{format}"
+			string fileName = Path.GetFileName(filePath);
+			UploadResponse response = await $"{UPLOAD_URL}/{format}"
 				.WithOAuthBearerToken(auth.OAuth2Token.Access_Token)
 				.WithHeader("NK", "NT")
 				.WithHeader("origin", ORIGIN)
@@ -134,15 +134,15 @@ namespace Garmin
 				})
 				.ReceiveJson<UploadResponse>();
 
-			var result = response.DetailedImportResult;
+			DetailedImportResult result = response.DetailedImportResult;
 
 			if (result.Failures.Any())
 			{
-				foreach (var failure in result.Failures)
+				foreach (Failure failure in result.Failures)
 				{
 					if (failure.Messages.Any())
 					{
-						foreach (var message in failure.Messages)
+						foreach (Messages message in failure.Messages)
 						{
 							if (message.Code == 202)
 							{

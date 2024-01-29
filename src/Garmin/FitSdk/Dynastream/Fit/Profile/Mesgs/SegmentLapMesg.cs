@@ -13,18 +13,15 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
-using System.IO;
 using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the SegmentLap profile message.
-    /// </summary>
-    public class SegmentLapMesg : Mesg
+	/// <summary>
+	/// Implements the SegmentLap profile message.
+	/// </summary>
+	public class SegmentLapMesg : Mesg
     {
         #region Fields
         static class TotalCyclesSubfield

@@ -20,13 +20,13 @@ public class SystemInfoServiceTests
 	{
 		// SETUP
 		var autoMocker = new AutoMocker();
-		var controller = autoMocker.CreateInstance<SystemInfoService>();
-		var ghService = autoMocker.GetMock<IGitHubReleaseCheckService>();
+		SystemInfoService controller = autoMocker.CreateInstance<SystemInfoService>();
+		Mock<IGitHubReleaseCheckService> ghService = autoMocker.GetMock<IGitHubReleaseCheckService>();
 
 		var request = new SystemInfoGetRequest() { CheckForUpdate = false };
 
 		// ACT
-		var response = await controller.GetAsync(request, scheme: "https", host: "localhost");
+		SystemInfoGetResponse response = await controller.GetAsync(request, scheme: "https", host: "localhost");
 
 		// ASSERT
 		response.Should().NotBeNull();
@@ -42,8 +42,8 @@ public class SystemInfoServiceTests
 	{
 		// SETUP
 		var autoMocker = new AutoMocker();
-		var controller = autoMocker.CreateInstance<SystemInfoService>();
-		var ghService = autoMocker.GetMock<IVersionInformationService>();
+		SystemInfoService controller = autoMocker.CreateInstance<SystemInfoService>();
+		Mock<IVersionInformationService> ghService = autoMocker.GetMock<IVersionInformationService>();
 
 		ghService.Setup(x => x.GetLatestReleaseInformationAsync())
 			.ReturnsAsync(new LatestReleaseInformation()
@@ -57,7 +57,7 @@ public class SystemInfoServiceTests
 
 		// ACT
 		var request = new SystemInfoGetRequest() { CheckForUpdate = true };
-		var response = await controller.GetAsync(request, scheme: "https", host: "localhost");
+		SystemInfoGetResponse response = await controller.GetAsync(request, scheme: "https", host: "localhost");
 
 		// ASSERT
 		response.Should().NotBeNull();

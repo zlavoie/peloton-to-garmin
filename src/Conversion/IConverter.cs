@@ -98,7 +98,7 @@ namespace Conversion
 
 		public async Task<ConvertStatus> ConvertAsync(P2GWorkout workoutData)
 		{
-			using var tracing = Tracing.Trace($"{nameof(IConverter)}.{nameof(ConvertAsync)}.Workout")?
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(IConverter)}.{nameof(ConvertAsync)}.Workout")?
 										.WithWorkoutId(workoutData.Workout.Id)
 										.WithTag(TagKey.Format, Format.ToString());
 
@@ -113,7 +113,7 @@ namespace Conversion
 
 			// call internal convert method
 			T converted = default;
-			var workoutTitle = WorkoutHelper.GetUniqueTitle(workoutData.Workout, settings.Format);
+			string workoutTitle = WorkoutHelper.GetUniqueTitle(workoutData.Workout, settings.Format);
 			try
 			{
 				converted = await ConvertInternalAsync(workoutData, settings);
@@ -131,7 +131,7 @@ namespace Conversion
 			}
 
 			// write to output dir
-			var path = Path.Join(settings.App.WorkingDirectory, $"{workoutTitle}.{Format}");
+			string path = Path.Join(settings.App.WorkingDirectory, $"{workoutTitle}.{Format}");
 			try
 			{
 				_fileHandler.MkDirIfNotExists(settings.App.WorkingDirectory);
@@ -159,7 +159,7 @@ namespace Conversion
 			{
 				try
 				{
-					var uploadDest = Path.Join(settings.App.UploadDirectory, $"{workoutTitle}.{Format.ToString().ToLower()}");
+					string uploadDest = Path.Join(settings.App.UploadDirectory, $"{workoutTitle}.{Format.ToString().ToLower()}");
 					_fileHandler.MkDirIfNotExists(settings.App.UploadDirectory);
 					_fileHandler.Copy(path, uploadDest, overwrite: true);
 					_logger.Debug("Prepped {@Format} for upload: {@Path}", Format, uploadDest);
@@ -182,17 +182,17 @@ namespace Conversion
 
 		protected void CopyToLocalSaveDir(string sourcePath, string workoutTitle, Settings settings)
 		{
-			using var tracing = Tracing.Trace($"{nameof(FitConverter)}.{nameof(CopyToLocalSaveDir)}")
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(FitConverter)}.{nameof(CopyToLocalSaveDir)}")
 										.WithTag(TagKey.Format, FileFormat.Json.ToString());
 
-			var formatString = Format.ToString().ToLower();
-			var localSaveDir = Path.GetFullPath(Path.Join(settings.App.OutputDirectory, formatString));
+			string formatString = Format.ToString().ToLower();
+			string localSaveDir = Path.GetFullPath(Path.Join(settings.App.OutputDirectory, formatString));
 
 			try
 			{
 				_fileHandler.MkDirIfNotExists(localSaveDir);
 
-				var backupDest = Path.Join(localSaveDir, $"{workoutTitle}.{formatString}");
+				string backupDest = Path.Join(localSaveDir, $"{workoutTitle}.{formatString}");
 				_fileHandler.Copy(sourcePath, backupDest, overwrite: true);
 				_logger.Information("[{@Format}] Backed up file {@File}", Format, backupDest);
 			}
@@ -204,14 +204,14 @@ namespace Conversion
 
 		protected System.DateTime GetStartTimeUtc(Workout workout)
 		{
-			var startTimeInSeconds = workout.Start_Time;
+			long startTimeInSeconds = workout.Start_Time;
 			var dateTime = DateTimeOffset.FromUnixTimeSeconds(startTimeInSeconds);
 			return dateTime.UtcDateTime;
 		}
 
 		protected System.DateTime GetEndTimeUtc(Workout workout, WorkoutSamples workoutSamples)
 		{
-			var endTimeSeconds = workout.End_Time ?? workoutSamples.Duration + workout.Start_Time;
+			long endTimeSeconds = workout.End_Time ?? workoutSamples.Duration + workout.Start_Time;
 			var dateTime = DateTimeOffset.FromUnixTimeSeconds(endTimeSeconds);
 			return dateTime.UtcDateTime;
 		}
@@ -223,7 +223,7 @@ namespace Conversion
 
 		public static float ConvertDistanceToMeters(double value, string unit)
 		{
-			var distanceUnit = UnitHelpers.GetDistanceUnit(unit);
+			DistanceUnit distanceUnit = UnitHelpers.GetDistanceUnit(unit);
 			switch (distanceUnit)
 			{
 				case DistanceUnit.Kilometers:
@@ -242,7 +242,7 @@ namespace Conversion
 
 		public static float ConvertWeightToKilograms(double value, string unit)
 		{
-			var weightUnit = UnitHelpers.GetWeightUnit(unit);
+			WeightUnit weightUnit = UnitHelpers.GetWeightUnit(unit);
 			switch (weightUnit)
 			{
 				case WeightUnit.Pounds:
@@ -255,10 +255,10 @@ namespace Conversion
 
 		public static float GetTotalDistance(WorkoutSamples workoutSamples)
 		{
-			var distanceSummary = GetDistanceSummary(workoutSamples);
+			Summary distanceSummary = GetDistanceSummary(workoutSamples);
 			if (distanceSummary is null) return 0.0f;
 
-			var unit = distanceSummary.Display_Unit;
+			string unit = distanceSummary.Display_Unit;
 			return ConvertDistanceToMeters(distanceSummary.Value.GetValueOrDefault(), unit);
 		}
 
@@ -267,19 +267,19 @@ namespace Conversion
 			float val = (float)value.GetValueOrDefault();
 			if (val <= 0) return 0.0f;
 
-			var unit = UnitHelpers.GetSpeedUnit(displayUnit);
+			SpeedUnit unit = UnitHelpers.GetSpeedUnit(displayUnit);
 
 			switch(unit)
 			{
 				case SpeedUnit.KilometersPerHour:
 				case SpeedUnit.MilesPerHour:
-					var meters = ConvertDistanceToMeters(val, displayUnit);
-					var metersPerMinute = meters / 60;
-					var metersPerSecond = metersPerMinute / 60;
+					float meters = ConvertDistanceToMeters(val, displayUnit);
+					float metersPerMinute = meters / 60;
+					float metersPerSecond = metersPerMinute / 60;
 					return metersPerSecond;
 				case SpeedUnit.MinutesPer500Meters:
 					float secondsPer500m = val * 60f;
-					var mps = 500 / secondsPer500m;
+					float mps = 500 / secondsPer500m;
 					return mps;
 				default:
 					Log.Error("Found unknown speed unit {@Unit}", unit);
@@ -295,8 +295,8 @@ namespace Conversion
 				return null;
 			}
 
-			var summaries = workoutSamples.Summaries;
-			var distanceSummary = summaries.FirstOrDefault(s => s.Slug == "distance");
+			System.Collections.Generic.ICollection<Summary> summaries = workoutSamples.Summaries;
+			Summary distanceSummary = summaries.FirstOrDefault(s => s.Slug == "distance");
 			if (distanceSummary is null)
 				_logger.Verbose("No distance slug found.");
 
@@ -311,8 +311,8 @@ namespace Conversion
 				return null;
 			}
 
-			var summaries = workoutSamples.Summaries;
-			var caloriesSummary = summaries.FirstOrDefault(s => s.Slug == "calories");
+			System.Collections.Generic.ICollection<Summary> summaries = workoutSamples.Summaries;
+			Summary caloriesSummary = summaries.FirstOrDefault(s => s.Slug == "calories");
 			if (caloriesSummary is not null)
 				return caloriesSummary;
 
@@ -327,32 +327,32 @@ namespace Conversion
 
 		protected float GetMaxSpeedMetersPerSecond(WorkoutSamples workoutSamples)
 		{
-			var speedSummary = GetSpeedSummary(workoutSamples);
+			Metric speedSummary = GetSpeedSummary(workoutSamples);
 			if (speedSummary is null) return 0.0f;
 
-			var max = speedSummary.Max_Value.GetValueOrDefault();
+			double max = speedSummary.Max_Value.GetValueOrDefault();
 			return ConvertToMetersPerSecond(max, speedSummary.Display_Unit);
 		}
 
 		protected float GetAvgSpeedMetersPerSecond(WorkoutSamples workoutSamples)
 		{
-			var speedSummary = GetSpeedSummary(workoutSamples);
+			Metric speedSummary = GetSpeedSummary(workoutSamples);
 			if (speedSummary is null) return 0.0f;
 
-			var avg = speedSummary.Average_Value.GetValueOrDefault();
+			double avg = speedSummary.Average_Value.GetValueOrDefault();
 			return ConvertToMetersPerSecond(avg, speedSummary.Display_Unit);
 		}
 
 		protected float GetAvgGrade(WorkoutSamples workoutSamples)
 		{
-			var gradeSummary = GetGradeSummary(workoutSamples);
+			Metric gradeSummary = GetGradeSummary(workoutSamples);
 			if (gradeSummary is null) return 0.0f;
 
 			return (float)gradeSummary.Average_Value;
 		}
 		protected float GetMaxGrade(WorkoutSamples workoutSamples)
 		{
-			var gradeSummary = GetGradeSummary(workoutSamples);
+			Metric gradeSummary = GetGradeSummary(workoutSamples);
 			if (gradeSummary is null) return 0.0f;
 
 			return (float)gradeSummary.Max_Value;
@@ -365,7 +365,7 @@ namespace Conversion
 
 		protected Metric GetSpeedSummary(WorkoutSamples workoutSamples)
 		{
-			var speed = GetMetric("speed", workoutSamples);
+			Metric speed = GetMetric("speed", workoutSamples);
 
 			if (speed is null)
 				speed = GetMetric("split_pace", workoutSamples);
@@ -375,14 +375,14 @@ namespace Conversion
 
 		protected byte? GetUserMaxHeartRate(WorkoutSamples workoutSamples) 
 		{
-			var maxZone = GetHeartRateZone(5, workoutSamples);
+			Zone maxZone = GetHeartRateZone(5, workoutSamples);
 
 			return (byte?)maxZone?.Max_Value;
 		}
 
 		protected Zone GetHeartRateZone(int zone, WorkoutSamples workoutSamples)
 		{
-			var hrData = GetHeartRateSummary(workoutSamples);
+			Metric hrData = GetHeartRateSummary(workoutSamples);
 
 			if (hrData is null) return null;
 
@@ -391,10 +391,10 @@ namespace Conversion
 
 		protected PowerZones CalculatePowerZones(Workout workout)
 		{
-			var ftpMaybe = workout.Ftp_Info?.Ftp;
+			ushort? ftpMaybe = workout.Ftp_Info?.Ftp;
 			if (ftpMaybe is null || ftpMaybe <= 0) return null;
 
-			var ftp = ftpMaybe.Value;
+			ushort ftp = ftpMaybe.Value;
 			return new PowerZones()
 			{
 				Zone1 = new Zone()
@@ -444,15 +444,15 @@ namespace Conversion
 
 		protected PowerZones GetTimeInPowerZones(Workout workout, WorkoutSamples workoutSamples)
 		{
-			var powerZoneData = GetOutputSummary(workoutSamples);
+			Metric powerZoneData = GetOutputSummary(workoutSamples);
 
 			if (powerZoneData is null) return null;
 
-			var zones = CalculatePowerZones(workout);
+			PowerZones zones = CalculatePowerZones(workout);
 
 			if (zones is null) return null;
 
-			foreach (var value in powerZoneData.Values)
+			foreach (double? value in powerZoneData.Values)
 			{
 				if (zones.Zone1.Min_Value <= value
 					&& zones.Zone1.Max_Value >= value)
@@ -527,7 +527,7 @@ namespace Conversion
 
 		public static GraphData GetCadenceTargets(WorkoutSamples workoutSamples)
 		{
-			var targets = workoutSamples.Target_Performance_Metrics?.Target_Graph_Metrics?.FirstOrDefault(w => w.Type == "cadence")?.Graph_Data;
+			GraphData targets = workoutSamples.Target_Performance_Metrics?.Target_Graph_Metrics?.FirstOrDefault(w => w.Type == "cadence")?.Graph_Data;
 
 			if (targets is null)
 				targets = workoutSamples.Target_Performance_Metrics?.Target_Graph_Metrics?.FirstOrDefault(w => w.Type == "stroke_rate")?.Graph_Data;
@@ -548,10 +548,10 @@ namespace Conversion
 				return null;
 			}
 
-			var metric = workoutSamples.Metrics.FirstOrDefault(s => s.Slug == slug);
+			Metric metric = workoutSamples.Metrics.FirstOrDefault(s => s.Slug == slug);
 			if (metric is null)
 			{
-				var alts = workoutSamples.Metrics
+				System.Collections.Generic.IEnumerable<Metric> alts = workoutSamples.Metrics
 					.Where(w => w.Alternatives is object)
 					.SelectMany(s => s.Alternatives);
 				metric = alts.FirstOrDefault(s => s.Slug == slug);
@@ -613,7 +613,7 @@ namespace Conversion
 
 		protected static Sport GetGarminSport(Workout workout)
 		{
-			var fitnessDiscipline = workout.Fitness_Discipline;
+			FitnessDiscipline fitnessDiscipline = workout.Fitness_Discipline;
 			switch (fitnessDiscipline)
 			{
 				case FitnessDiscipline.Cycling:

@@ -65,7 +65,7 @@ public class SettingsController : Controller
 	{
 		try
 		{
-			var result = await _settingsUpdaterService.UpdateAppSettingsAsync(updatedAppSettings);
+			ServiceResult<App> result = await _settingsUpdaterService.UpdateAppSettingsAsync(updatedAppSettings);
 
 			if (result.IsErrored())
 				return result.GetResultForError();
@@ -92,7 +92,7 @@ public class SettingsController : Controller
 	{
 		try
 		{
-			var result = await _settingsUpdaterService.UpdateFormatSettingsAsync(updatedFormatSettings);
+			ServiceResult<Format> result = await _settingsUpdaterService.UpdateFormatSettingsAsync(updatedFormatSettings);
 
 			if (result.IsErrored())
 				return result.GetResultForError();
@@ -119,7 +119,7 @@ public class SettingsController : Controller
 	{
 		try
 		{
-			var result = await _settingsUpdaterService.UpdatePelotonSettingsAsync(updatedPelotonSettings);
+			ServiceResult<SettingsPelotonGetResponse> result = await _settingsUpdaterService.UpdatePelotonSettingsAsync(updatedPelotonSettings);
 
 			if (result.IsErrored())
 				return result.GetResultForError();
@@ -146,7 +146,7 @@ public class SettingsController : Controller
 	{
 		try
 		{
-			var result = await _settingsUpdaterService.UpdateGarminSettingsAsync(updatedGarminSettings);
+			ServiceResult<SettingsGarminGetResponse> result = await _settingsUpdaterService.UpdateGarminSettingsAsync(updatedGarminSettings);
 
 			if (result.IsErrored())
 				return result.GetResultForError();

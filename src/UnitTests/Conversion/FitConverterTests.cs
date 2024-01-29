@@ -21,7 +21,7 @@ namespace UnitTests.Conversion
 		public void Converter_Should_Provide_Formt_of_FIT()
 		{
 			var mocker = new AutoMocker();
-			var converter = mocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = mocker.CreateInstance<ConverterInstance>();
 
 			converter.Format.Should().Be(FileFormat.Fit);
 		}
@@ -30,7 +30,7 @@ namespace UnitTests.Conversion
 		public void ShouldConvert_ShouldOnly_Support_Fit([Values] bool tcx, [Values] bool json, [Values] bool fit)
 		{
 			var mocker = new AutoMocker();
-			var converter = mocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = mocker.CreateInstance<ConverterInstance>();
 
 			var formatSettings = new Format()
 			{
@@ -80,7 +80,7 @@ namespace UnitTests.Conversion
 		[TestCase("rower_workout", PreferredLapType.Class_Targets)]
 		public async Task Fit_Converter_Creates_Valid_Fit(string filename, PreferredLapType lapType)
 		{
-			var workoutPath = Path.Join(DataDirectory, $"{filename}.json");
+			string workoutPath = Path.Join(DataDirectory, $"{filename}.json");
 			var settings = new Settings()
 			{
 				Format = new Format()
@@ -97,13 +97,13 @@ namespace UnitTests.Conversion
 			};
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var convertedMesgs = await converter.ConvertForTest(workoutPath, settings);
+			ICollection<Mesg> convertedMesgs = await converter.ConvertForTest(workoutPath, settings);
 
 			convertedMesgs.Should().NotBeNullOrEmpty();
 
-			var dest = Path.Join(DataDirectory, $"test_output_{filename}.fit");
+			string dest = Path.Join(DataDirectory, $"test_output_{filename}.fit");
 			try
 			{
 				using (FileStream fitDest = new FileStream(dest, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
@@ -136,9 +136,9 @@ namespace UnitTests.Conversion
 			};
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var mesg = converter.GetDeviceInfo(info, new Dynastream.Fit.DateTime(System.DateTime.Now));
+			DeviceInfoMesg mesg = converter.GetDeviceInfo(info, new Dynastream.Fit.DateTime(System.DateTime.Now));
 
 			mesg.GetSerialNumber().Should().Be(info.UnitId);
 			mesg.GetManufacturer().Should().Be(info.ManufacturerId);
@@ -146,7 +146,7 @@ namespace UnitTests.Conversion
 			mesg.GetDeviceIndex().Should().Be(0);
 			mesg.GetSourceType().Should().Be(SourceType.Local);
 
-			var version = mesg.GetSoftwareVersion();
+			float? version = mesg.GetSoftwareVersion();
 
 			if (minor <= 0)
 			{
@@ -174,8 +174,8 @@ namespace UnitTests.Conversion
 
 			public async Task<ICollection<Mesg>> ConvertForTest(string path, Settings settings)
 			{
-				var workoutData = fileHandler.DeserializeJson<P2GWorkout>(path);
-				var converted = await this.ConvertInternalAsync(workoutData, settings);
+				P2GWorkout workoutData = fileHandler.DeserializeJson<P2GWorkout>(path);
+				System.Tuple<string, ICollection<Mesg>> converted = await this.ConvertInternalAsync(workoutData, settings);
 
 				return converted.Item2;
 			}

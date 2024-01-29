@@ -13,11 +13,10 @@
 #endregion
 
 using System;
-using System.IO;
 
 namespace Dynastream.Fit
 {
-    internal class DeveloperDataKey
+	internal class DeveloperDataKey
         : IComparable
     {
         public byte DeveloperDataIndex { get; private set; }

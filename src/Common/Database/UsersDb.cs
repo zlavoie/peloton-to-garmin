@@ -37,19 +37,19 @@ public class UsersDb : DbBase<P2GUser>, IUsersDb
 
 	public async Task<ICollection<P2GUser>> GetUsersAsync()
 	{
-		using var metrics = DbMetrics.DbActionDuration
+		using ITimer metrics = DbMetrics.DbActionDuration
 									.WithLabels("get", DbName)
 									.NewTimer();
-		using var tracing = Tracing.Trace($"{nameof(SettingsDb)}.{nameof(GetUsersAsync)}", TagValue.Db)
+		using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(SettingsDb)}.{nameof(GetUsersAsync)}", TagValue.Db)
 									.WithTable(DbName);
 
 		try
 		{
-			var users = _db.GetCollection<P2GUser>(UsersCollections);
+			IDocumentCollection<P2GUser> users = _db.GetCollection<P2GUser>(UsersCollections);
 
 			if (users.Count <= 0)
 			{
-				var success = await users.InsertOneAsync(_defaultUser);
+				bool success = await users.InsertOneAsync(_defaultUser);
 				if (!success)
 				{
 					_logger.Error("Failed to save default User to Db.");

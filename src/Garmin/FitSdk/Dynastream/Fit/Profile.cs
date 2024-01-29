@@ -12,18 +12,14 @@
 
 #endregion
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Represents the Fit Profile including message, field and type definition.
-    /// </summary>
-    public static class Profile
+	/// <summary>
+	/// Represents the Fit Profile including message, field and type definition.
+	/// </summary>
+	public static class Profile
     {
         #region Nested Types
 

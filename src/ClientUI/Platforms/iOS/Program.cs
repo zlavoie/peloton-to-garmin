@@ -1,7 +1,4 @@
-﻿using ObjCRuntime;
-using UIKit;
-
-namespace ClientUI
+﻿namespace ClientUI
 {
 	public class Program
 	{

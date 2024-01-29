@@ -13,18 +13,16 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using System.IO;
 
 namespace Dynastream.Utility
 {
-    /// <summary>
-    /// Extend framework BinaryReader to support BigEndian datasources.
-    /// When reading multibyte values, the bytes are reordered appropriately.
-    /// </summary>
-    public class EndianBinaryReader : BinaryReader
+	/// <summary>
+	/// Extend framework BinaryReader to support BigEndian datasources.
+	/// When reading multibyte values, the bytes are reordered appropriately.
+	/// </summary>
+	public class EndianBinaryReader : BinaryReader
     {
         #region Fields
         private bool isBigEndian = false;

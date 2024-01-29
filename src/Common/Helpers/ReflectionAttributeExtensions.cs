@@ -18,17 +18,17 @@ namespace Common.Helpers
 
         public static string GetFieldDescription(this System.Type type, string fieldName)
         {
-            using var metrics = ReflectionActionDuration
+            using ITimer metrics = ReflectionActionDuration
                                     .WithLabels(GetFieldDescriptionName)
                                     .NewTimer();
-            using var tracing = Tracing.Trace(GetFieldDescriptionName);
+            using System.Diagnostics.Activity tracing = Tracing.Trace(GetFieldDescriptionName);
 
-            var properties = TypeDescriptor.GetProperties(type);
+			PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(type);
             if (properties is null || properties.Count == 0) return string.Empty;
 
             try
             {
-                var attributes = properties[fieldName].Attributes;
+				AttributeCollection attributes = properties[fieldName].Attributes;
                 
                 if (attributes is null || attributes.Count <= 0) return string.Empty;
 

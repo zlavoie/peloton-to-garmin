@@ -13,18 +13,15 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
-using System.IO;
 using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the SegmentId profile message.
-    /// </summary>
-    public class SegmentIdMesg : Mesg
+	/// <summary>
+	/// Implements the SegmentId profile message.
+	/// </summary>
+	public class SegmentIdMesg : Mesg
     {
         #region Fields
         #endregion

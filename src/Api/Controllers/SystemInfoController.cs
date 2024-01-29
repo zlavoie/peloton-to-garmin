@@ -26,7 +26,7 @@ namespace WebApp.Controllers
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		public async Task<ActionResult<SystemInfoGetResponse>> GetAsync([FromQuery]SystemInfoGetRequest request)
 		{
-			var result = await _systemInfoService.GetAsync(request, this.Request.Scheme, this.Request.Host.ToString());
+			SystemInfoGetResponse result = await _systemInfoService.GetAsync(request, this.Request.Scheme, this.Request.Host.ToString());
 			return Ok(result);
 		}
 
@@ -38,7 +38,7 @@ namespace WebApp.Controllers
 		{
 			try
 			{
-				var result = await _systemInfoService.GetLogsAsync();
+				Common.Dto.ServiceResult<SystemInfoLogsGetResponse> result = await _systemInfoService.GetLogsAsync();
 
 				if (result.IsErrored())
 					return result.GetResultForError();

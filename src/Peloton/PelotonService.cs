@@ -77,14 +77,14 @@ namespace Peloton
 
 		public async Task<UserData> GetUserDataAsync()
 		{
-			using var tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetUserDataAsync)}");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetUserDataAsync)}");
 
 			return await _pelotonApi.GetUserDataAsync();
 		}
 
 		public async Task<PagedPelotonResponse<Workout>> GetPelotonWorkoutsAsync(int pageSize, int pageIndex)
 		{
-			using var tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetPelotonWorkoutsAsync)}")
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetPelotonWorkoutsAsync)}")
 										.WithTag("workouts.pageSize", pageSize.ToString())
 										.WithTag("workouts.pageIndex", pageIndex.ToString());
 
@@ -103,7 +103,7 @@ namespace Peloton
 
 		public async Task<ServiceResult<ICollection<Workout>>> GetRecentWorkoutsAsync(int numWorkoutsToDownload)
 		{
-			using var tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetRecentWorkoutsAsync)}")
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetRecentWorkoutsAsync)}")
 										.WithTag("workouts.requested", numWorkoutsToDownload.ToString());
 
 			var result = new ServiceResult<ICollection<Workout>>();
@@ -113,12 +113,12 @@ namespace Peloton
 			
 			try
 			{
-				var page = 0;
+				int page = 0;
 				while (numWorkoutsToDownload > 0)
 				{
 					_logger.Debug("Fetching recent workouts page: {@Page}", page);
 
-					var workouts = await _pelotonApi.GetWorkoutsAsync(numWorkoutsToDownload, page);
+					PagedPelotonResponse<Workout> workouts = await _pelotonApi.GetWorkoutsAsync(numWorkoutsToDownload, page);
 					if (workouts.data is null || workouts.data.Count <= 0)
 					{
 						_logger.Debug("No more workouts found from Peloton.");
@@ -174,14 +174,14 @@ namespace Peloton
 
 		public async Task<ServiceResult<ICollection<Workout>>> GetWorkoutsSinceAsync(DateTime sinceDt)
 		{
-			using var tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetWorkoutsSinceAsync)}")
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetWorkoutsSinceAsync)}")
 										.WithTag("workouts.sinceDt", sinceDt.ToString());
 			
 			var result = new ServiceResult<ICollection<Workout>>();
 
 			try
 			{
-				var workouts = await _pelotonApi.GetWorkoutsAsync(fromUtc: sinceDt, toUtc: DateTime.UtcNow);
+				PelotonResponse<Workout> workouts = await _pelotonApi.GetWorkoutsAsync(fromUtc: sinceDt, toUtc: DateTime.UtcNow);
 				result.Result = workouts.data;
 				return result;
 			}
@@ -222,16 +222,16 @@ namespace Peloton
 
 		public async Task<P2GWorkout[]> GetWorkoutDetailsAsync(ICollection<Workout> workoutIds)
 		{
-			using var tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetWorkoutDetailsAsync)}.List");
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetWorkoutDetailsAsync)}.List");
 
 			if (workoutIds is null || workoutIds.Count() <= 0) return new P2GWorkout[0];
 
-			var maxBatchSize = 25;
+			int maxBatchSize = 25;
 			var tasks = new List<Task<P2GWorkout>>(maxBatchSize);
 			var results = new List<P2GWorkout>(workoutIds.Count);
 			var stack = new Stack<Workout>(workoutIds);
-			var batchSize = 0;
-			while (stack.TryPop(out var popped))
+			int batchSize = 0;
+			while (stack.TryPop(out Workout popped))
 			{
 				batchSize++;
 				tasks.Add(GetWorkoutDetailsAsync(popped.Id));
@@ -239,8 +239,8 @@ namespace Peloton
 				if (batchSize >= maxBatchSize)
 				{
 					_logger.Verbose($"Fetching Batch Size: {batchSize}");
-					var awaited = await Task.WhenAll(tasks);
-					var successful = awaited.Where(t => t is object);
+					P2GWorkout[] awaited = await Task.WhenAll(tasks);
+					IEnumerable<P2GWorkout> successful = awaited.Where(t => t is object);
 					results.AddRange(successful);
 
 					batchSize = 0;
@@ -250,8 +250,8 @@ namespace Peloton
 
 			if (tasks.Any())
 			{
-				var awaited = await Task.WhenAll(tasks);
-				var successful = awaited.Where(t => t is object);
+				P2GWorkout[] awaited = await Task.WhenAll(tasks);
+				IEnumerable<P2GWorkout> successful = awaited.Where(t => t is object);
 				results.AddRange(successful);
 			}
 
@@ -260,28 +260,28 @@ namespace Peloton
 
 		public async Task<P2GWorkout> GetWorkoutDetailsAsync(string workoutId)
 		{
-			using var tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetWorkoutDetailsAsync)}.Item")
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(GetWorkoutDetailsAsync)}.Item")
 										.WithWorkoutId(workoutId);
 
-			using var workoutTimer = WorkoutDownloadDuration.NewTimer();
+			using ITimer workoutTimer = WorkoutDownloadDuration.NewTimer();
 
-			var workoutTask = _pelotonApi.GetWorkoutByIdAsync(workoutId);
-			var workoutSamplesTask = _pelotonApi.GetWorkoutSamplesByIdAsync(workoutId);
+			Task<JObject> workoutTask = _pelotonApi.GetWorkoutByIdAsync(workoutId);
+			Task<JObject> workoutSamplesTask = _pelotonApi.GetWorkoutSamplesByIdAsync(workoutId);
 
 			await Task.WhenAll(workoutTask, workoutSamplesTask);
 
-			var workout = await workoutTask;
-			var workoutSamples = await workoutSamplesTask;
+			JObject workout = await workoutTask;
+			JObject workoutSamples = await workoutSamplesTask;
 
-			var p2gWorkoutData = await BuildP2GWorkoutAsync(workoutId, workout, workoutSamples);
+			P2GWorkout p2gWorkoutData = await BuildP2GWorkoutAsync(workoutId, workout, workoutSamples);
 
-			var classId = p2gWorkoutData?.Workout?.Ride?.Id;
+			string classId = p2gWorkoutData?.Workout?.Ride?.Id;
 			if (!string.IsNullOrWhiteSpace(classId)
 				&& classId != "00000000000000000000000000000000")
 			{
 				try
 				{
-					var workoutSegments = await _pelotonApi.GetClassSegmentsAsync(classId);
+					RideSegments workoutSegments = await _pelotonApi.GetClassSegmentsAsync(classId);
 					p2gWorkoutData.Exercises = P2GWorkoutExerciseMapper.GetWorkoutExercises(p2gWorkoutData.Workout, workoutSegments);
 				} catch (Exception ex)
 				{
@@ -297,7 +297,7 @@ namespace Peloton
 
 		private async Task<P2GWorkout> BuildP2GWorkoutAsync(string workoutId, JObject workout, JObject workoutSamples)
 		{
-			using var tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(BuildP2GWorkoutAsync)}")
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(BuildP2GWorkoutAsync)}")
 										.WithWorkoutId(workoutId);
 
 			dynamic data = new JObject();
@@ -314,7 +314,7 @@ namespace Peloton
 			{
 				_failedCount++;
 
-				var title = "workout_failed_to_deserialize_" + workoutId;
+				string title = "workout_failed_to_deserialize_" + workoutId;
 				await SaveRawDataAsync(data, title);
 
 				_logger.Error("Failed to deserialize workout from Peloton. You can find the raw data from the workout here: {@FileName}", title, e);
@@ -325,7 +325,7 @@ namespace Peloton
 
 		private async Task SaveRawDataAsync(dynamic data, string workoutTitle)
 		{
-			using var tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(SaveRawDataAsync)}")
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(PelotonService)}.{nameof(SaveRawDataAsync)}")
 										.WithTag("workout.title", workoutTitle);
 
 			var settings = await _settingsService.GetSettingsAsync();

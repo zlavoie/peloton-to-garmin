@@ -1,7 +1,4 @@
-﻿using Android.App;
-using Android.Runtime;
-
-namespace ClientUI
+﻿namespace ClientUI
 {
 	[Application]
 	public class MainApplication : MauiApplication

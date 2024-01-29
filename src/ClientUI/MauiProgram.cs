@@ -32,11 +32,11 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 			});
 
-		var observabilityConfigFilePath = Statics.ConfigPath;
+		string observabilityConfigFilePath = Statics.ConfigPath;
 		if (!File.Exists(observabilityConfigFilePath))
 			InitObservabilityConfigFile("configuration.local.json", observabilityConfigFilePath);
 
-		var configProvider = builder.Configuration.AddJsonFile(observabilityConfigFilePath, optional: true, reloadOnChange: true)
+		IConfigurationBuilder configProvider = builder.Configuration.AddJsonFile(observabilityConfigFilePath, optional: true, reloadOnChange: true)
 				.AddEnvironmentVariables(prefix: "P2G_");
 
 		var config = new AppConfiguration();
@@ -75,10 +75,10 @@ public static class MauiProgram
 		using BinaryWriter writer = new BinaryWriter(outputStream);
 		using (BinaryReader reader = new BinaryReader(fs))
 		{
-			var bytesRead = 0;
+			int bytesRead = 0;
 
 			int bufferSize = 1024;
-			var buffer = new byte[bufferSize];
+			byte[] buffer = new byte[bufferSize];
 			using (fs)
 			{
 				do

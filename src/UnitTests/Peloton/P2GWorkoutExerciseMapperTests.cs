@@ -20,7 +20,7 @@ public class P2GWorkoutExerciseMapperTests
 	[Test, TestCaseSource(nameof(Workouts))]
 	public void GetExercisesTrackedByMovementTracker_WhenNoData(Workout workout)
 	{
-		var exercises = P2GWorkoutExerciseMapper.GetExercisesTrackedByMovementTracker(workout);
+		ICollection<global::Common.Dto.P2GExercise> exercises = P2GWorkoutExerciseMapper.GetExercisesTrackedByMovementTracker(workout);
 		exercises.Should().NotBeNull();
 		exercises.Should().BeEmpty();
 	}
@@ -64,7 +64,7 @@ public class P2GWorkoutExerciseMapperTests
 			}
 		};
 
-		var exercises = P2GWorkoutExerciseMapper.GetExercisesTrackedByMovementTracker(workout);
+		ICollection<global::Common.Dto.P2GExercise> exercises = P2GWorkoutExerciseMapper.GetExercisesTrackedByMovementTracker(workout);
 		exercises.Should().NotBeNull();
 		exercises.Should().HaveCount(5);
 		exercises.Should().OnlyContain(e => e.Weight != null);

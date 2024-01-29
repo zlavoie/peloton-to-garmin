@@ -13,15 +13,11 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
 
 namespace Dynastream.Fit
 {
-    // Define our necessary event types (EventArgs and the delegate)
-    public delegate void MesgEventHandler(object sender, MesgEventArgs e);
+	// Define our necessary event types (EventArgs and the delegate)
+	public delegate void MesgEventHandler(object sender, MesgEventArgs e);
     public delegate void MesgDefinitionEventHandler(object sender, MesgDefinitionEventArgs e);
 
     public class MesgEventArgs : EventArgs

@@ -48,8 +48,8 @@ namespace Sync
 
 		public async Task<SyncResult> SyncAsync(int numWorkouts)
 		{
-			using var timer = SyncHistogram.NewTimer();
-			using var activity = Tracing.Trace($"{nameof(SyncService)}.{nameof(SyncAsync)}.ByNumWorkouts")
+			using ITimer timer = SyncHistogram.NewTimer();
+			using System.Diagnostics.Activity activity = Tracing.Trace($"{nameof(SyncService)}.{nameof(SyncAsync)}.ByNumWorkouts")
 										.WithTag("numWorkouts", numWorkouts.ToString());
 
 			var settings = await _settingsService.GetSettingsAsync();
@@ -58,8 +58,8 @@ namespace Sync
 
 		public async Task<SyncResult> SyncAsync(IEnumerable<string> workoutIds, ICollection<WorkoutType>? exclude = null)
 		{
-			using var timer = SyncHistogram.NewTimer();
-			using var activity = Tracing.Trace($"{nameof(SyncService)}.{nameof(SyncAsync)}.ByWorkoutIds");
+			using ITimer timer = SyncHistogram.NewTimer();
+			using System.Diagnostics.Activity activity = Tracing.Trace($"{nameof(SyncService)}.{nameof(SyncAsync)}.ByWorkoutIds");
 
 			var response = new SyncResult();
 			var recentWorkouts = workoutIds.Select(w => new Workout() { Id = w }).ToList();
@@ -90,7 +90,7 @@ namespace Sync
 				return response;
 			}
 
-			var filteredWorkouts = workouts.Where(w => 
+			IEnumerable<P2GWorkout> filteredWorkouts = workouts.Where(w => 
 								{
 									if (w is null) return false;
 
@@ -105,7 +105,7 @@ namespace Sync
 									return true;
 								});
 
-			var filteredWorkoutsCount = filteredWorkouts.Count();
+			int filteredWorkoutsCount = filteredWorkouts.Count();
 			activity?.AddTag("workouts.filtered", filteredWorkoutsCount);
 			_logger.Information("Found {@NumWorkouts} workouts remaining after filtering ExcludedWorkoutTypes.", filteredWorkoutsCount);
 
@@ -122,7 +122,7 @@ namespace Sync
 			{
 				_logger.Information("Converting workouts...");
 				var tasks = new List<Task<ConvertStatus>>();
-				foreach (var workout in filteredWorkouts)
+				foreach (P2GWorkout? workout in filteredWorkouts)
 				{
 					workout.UserData = userData;
 					tasks.AddRange(_converters.Select(c => c.ConvertAsync(workout)));
@@ -159,7 +159,7 @@ namespace Sync
 				return response;
 			}
 
-			foreach (var convertStatus in convertStatuses)
+			foreach (ConvertStatus convertStatus in convertStatuses)
 				if (convertStatus.Result == ConversionResult.Failed)
 					response.Errors.Add(new ServiceError() { Message = convertStatus.ErrorMessage });
 
@@ -213,7 +213,7 @@ namespace Sync
 			return workouts?
 					.Where(w =>
 					{
-						var shouldKeep = w.Status == "COMPLETE";
+						bool shouldKeep = w.Status == "COMPLETE";
 						if (shouldKeep) return true;
 
 						_logger.Debug("Skipping in progress workout. {@WorkoutId} {@WorkoutStatus} {@WorkoutType} {@WorkoutTitle}", w.Id, w.Status, w.Fitness_Discipline, w.Title);
@@ -224,21 +224,21 @@ namespace Sync
 
 		private async Task<SyncResult> SyncWithWorkoutLoaderAsync(Func<Task<ServiceResult<ICollection<Workout>>>> loader, ICollection<WorkoutType>? exclude)
 		{
-			using var activity = Tracing.Trace($"{nameof(SyncService)}.{nameof(SyncAsync)}.SyncWithWorkoutLoaderAsync");
+			using System.Diagnostics.Activity? activity = Tracing.Trace($"{nameof(SyncService)}.{nameof(SyncAsync)}.SyncWithWorkoutLoaderAsync");
 
 			ICollection<Workout> recentWorkouts;
-			var syncTime = await _db.GetSyncStatusAsync();
+			SyncServiceStatus syncTime = await _db.GetSyncStatusAsync();
 			var settings = await _settingsService.GetSettingsAsync();
 			syncTime.LastSyncTime = DateTime.Now;
 
 			try
 			{
-				var recentWorkoutsServiceResult = await loader();
+				ServiceResult<ICollection<Workout>> recentWorkoutsServiceResult = await loader();
 				recentWorkouts = recentWorkoutsServiceResult.Result;
 			}
 			catch (ArgumentException ae)
 			{
-				var errorMessage = $"Failed to fetch workouts from Peloton: {ae.Message}";
+				string errorMessage = $"Failed to fetch workouts from Peloton: {ae.Message}";
 
 				_logger.Error(ae, errorMessage);
 				activity?.AddTag("exception.message", ae.Message);
@@ -256,7 +256,7 @@ namespace Sync
 			}
 			catch (Exception ex)
 			{
-				var errorMessage = "Failed to fetch workouts from Peloton.";
+				string errorMessage = "Failed to fetch workouts from Peloton.";
 
 				_logger.Error(ex, errorMessage);
 				activity?.AddTag("exception.message", ex.Message);
@@ -273,9 +273,9 @@ namespace Sync
 				return response;
 			}
 
-			var completedWorkouts = FilterToCompletedWorkoutIds(recentWorkouts);
+			IEnumerable<string> completedWorkouts = FilterToCompletedWorkoutIds(recentWorkouts);
 
-			var completedWorkoutsCount = completedWorkouts.Count();
+			int completedWorkoutsCount = completedWorkouts.Count();
 			_logger.Information("Found {@NumWorkouts} completed workouts.", completedWorkoutsCount);
 			activity?.AddTag("workouts.completed", completedWorkoutsCount);
 

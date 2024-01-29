@@ -19,7 +19,7 @@ public static class Encryption
 			aesAlg.Key = key;
 			aesAlg.IV = iv;
 
-			using (var encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV))
+			using (ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV))
 			{
 				using (var msEncrypt = new MemoryStream())
 				{
@@ -29,7 +29,7 @@ public static class Encryption
 						swEncrypt.Write(text);
 					}
 
-					var encrypted = msEncrypt.ToArray();
+					byte[] encrypted = msEncrypt.ToArray();
 					return Convert.ToBase64String(encrypted);
 				}
 			}
@@ -40,15 +40,15 @@ public static class Encryption
 
 	public static string DecryptString(this string cipherText, byte[] key, byte[] iv)
 	{
-		var encrypted = Convert.FromBase64String(cipherText);
-		var encryptedByteArray = encrypted.ToArray();
+		byte[] encrypted = Convert.FromBase64String(cipherText);
+		byte[] encryptedByteArray = encrypted.ToArray();
 
 		using (var aesAlg = Aes.Create())
 		{
 			aesAlg.Key = key;
 			aesAlg.IV = iv;
 
-			using (var decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV))
+			using (ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV))
 			{
 				string result;
 				using (var msDecrypt = new MemoryStream(encryptedByteArray))
@@ -76,8 +76,8 @@ public static class Encryption
 			return;
 		}
 
-		var originalPassword = credentials.Password;
-		var originalEmail = credentials.Email;
+		string originalPassword = credentials.Password;
+		string originalEmail = credentials.Email;
 
 		try
 		{
@@ -104,7 +104,7 @@ public static class Encryption
 		{
 			try
 			{
-				var decrypted = credentials.Email.Decrypt();
+				string decrypted = credentials.Email.Decrypt();
 				credentials.Email = decrypted;
 			} catch (Exception e)
 			{
@@ -116,7 +116,7 @@ public static class Encryption
 		{
 			try
 			{
-				var decrypted = credentials.Password.Decrypt();
+				string decrypted = credentials.Password.Decrypt();
 				credentials.Password = decrypted;
 			}
 			catch (Exception e)

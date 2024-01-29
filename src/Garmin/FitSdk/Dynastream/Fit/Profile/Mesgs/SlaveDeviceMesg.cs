@@ -13,18 +13,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the SlaveDevice profile message.
-    /// </summary>
-    public class SlaveDeviceMesg : Mesg
+	/// <summary>
+	/// Implements the SlaveDevice profile message.
+	/// </summary>
+	public class SlaveDeviceMesg : Mesg
     {
         #region Fields
         static class ProductSubfield

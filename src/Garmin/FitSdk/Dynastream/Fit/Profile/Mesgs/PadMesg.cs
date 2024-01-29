@@ -12,19 +12,12 @@
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Linq;
-
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the Pad profile message.
-    /// </summary>
-    public class PadMesg : Mesg
+	/// <summary>
+	/// Implements the Pad profile message.
+	/// </summary>
+	public class PadMesg : Mesg
     {
         #region Fields
         #endregion

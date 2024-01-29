@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Api.Services;
 using Garmin.Auth;
 using Api.Service;
+using Garmin.Auth.Interfaces;
+using Common.Service.Interfaces;
 
 namespace SharedStartup;
 
@@ -51,6 +53,7 @@ public static class ApiStartupServices
 		services.AddSingleton<ISettingsUpdaterService, SettingsUpdaterService>();
 		services.AddSingleton<ISettingsDb, SettingsDb>();
 		services.AddSingleton<ISettingsService, SettingsService>();
+		services.AddSingleton<ISettingsRepository, SettingsRepository>();
 
 		// SYNC
 		services.AddSingleton<ISyncStatusDb, SyncStatusDb>();

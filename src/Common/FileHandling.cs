@@ -28,11 +28,11 @@ public class IOWrapper : IFileHandling
 
 	public void MkDirIfNotExists(string path)
 	{
-		using var trace1 = Tracing.Trace(nameof(MkDirIfNotExists), "io")
+		using System.Diagnostics.Activity trace1 = Tracing.Trace(nameof(MkDirIfNotExists), "io")
 									.WithTag("path", path);
 		if (!DirExists(path))
 		{
-			using var trace2 = Tracing.Trace("CreateDirectory", "io")
+			using System.Diagnostics.Activity trace2 = Tracing.Trace("CreateDirectory", "io")
 										.WithTag("path", path);
 			_logger.Debug("Creating directory {@Directory}", path);
 			Directory.CreateDirectory(path);
@@ -41,24 +41,24 @@ public class IOWrapper : IFileHandling
 
 	public bool DirExists(string path)
 	{
-		using var trace1 = Tracing.Trace(nameof(DirExists), "io")
+		using System.Diagnostics.Activity trace1 = Tracing.Trace(nameof(DirExists), "io")
 									.WithTag("path", path);
 		return Directory.Exists(path);
 	}
 
 	public bool FileExists(string path)
 	{
-		using var trace1 = Tracing.Trace(nameof(FileExists), "io")
+		using System.Diagnostics.Activity trace1 = Tracing.Trace(nameof(FileExists), "io")
 									.WithTag("path", path);
-		var p = Path.GetFullPath(path);
+		string p = Path.GetFullPath(path);
 		return File.Exists(p);
 	}
 
 	public string[] GetFiles(string path)
 	{
-		using var trace1 = Tracing.Trace(nameof(GetFiles), "io")
+		using System.Diagnostics.Activity trace1 = Tracing.Trace(nameof(GetFiles), "io")
 									.WithTag("path", path);
-		var files = Directory.GetFiles(path);
+		string[] files = Directory.GetFiles(path);
 
 		trace1?.AddTag("numFiles", files.Length);
 
@@ -67,7 +67,7 @@ public class IOWrapper : IFileHandling
 
 	public T DeserializeJson<T>(string file)
 	{
-		using var trace1 = Tracing.Trace(nameof(DeserializeJson), "io")
+		using System.Diagnostics.Activity trace1 = Tracing.Trace(nameof(DeserializeJson), "io")
 									.WithTag("path", file);
 
 		using (var reader = new StreamReader(file))
@@ -80,7 +80,7 @@ public class IOWrapper : IFileHandling
 	{
 		result = default;
 
-		using var trace = Tracing.Trace(nameof(TryDeserializeXml), "io")
+		using System.Diagnostics.Activity trace = Tracing.Trace(nameof(TryDeserializeXml), "io")
 									.WithTag("path", file);
 		if (!File.Exists(file)) return false;
 
@@ -114,7 +114,7 @@ public class IOWrapper : IFileHandling
 
 	public void MoveFailedFile(string fromPath, string toPath)
 	{
-		using var trace = Tracing.Trace(nameof(MoveFailedFile), "io")
+		using System.Diagnostics.Activity trace = Tracing.Trace(nameof(MoveFailedFile), "io")
 									.WithTag("path.from", fromPath)
 									.WithTag("path.to", toPath);
 		try
@@ -135,7 +135,7 @@ public class IOWrapper : IFileHandling
 
 	public void Copy(string from, string to, bool overwrite)
 	{
-		using var trace1 = Tracing.Trace(nameof(Copy), "io")
+		using System.Diagnostics.Activity trace1 = Tracing.Trace(nameof(Copy), "io")
 									.WithTag("path.from", from)
 									.WithTag("path.to", to)
 									.WithTag("overwrite", overwrite.ToString());
@@ -144,7 +144,7 @@ public class IOWrapper : IFileHandling
 
 	public bool WriteToFile(string path, string content)
 	{
-		using var trace = Tracing.Trace(nameof(WriteToFile), "io")
+		using System.Diagnostics.Activity trace = Tracing.Trace(nameof(WriteToFile), "io")
 									.WithTag("path", path);
 		try
 		{
@@ -163,12 +163,12 @@ public class IOWrapper : IFileHandling
 
 	public void Cleanup(string dir)
 	{
-		using var trace = Tracing.Trace(nameof(Cleanup), "io")
+		using System.Diagnostics.Activity trace = Tracing.Trace(nameof(Cleanup), "io")
 									.WithTag("path", dir);
 		if (!DirExists(dir))
 			return;
 
-		using var trace2 = Tracing.Trace("DeleteDir", "io")
+		using System.Diagnostics.Activity trace2 = Tracing.Trace("DeleteDir", "io")
 										.WithTag("path", dir);
 
 		try

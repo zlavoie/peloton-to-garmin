@@ -32,7 +32,7 @@ public class PelotonAnnualChallengeController : Controller
 	{
 		try
 		{
-			var serviceResult = await _annualChallengeService.GetProgressAsync();
+			Common.Dto.ServiceResult<ProgressGetResponse> serviceResult = await _annualChallengeService.GetProgressAsync();
 
 			if (serviceResult.IsErrored())
 				return serviceResult.GetResultForError();

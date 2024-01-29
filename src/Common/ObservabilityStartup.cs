@@ -3,7 +3,6 @@ using Common.Observe;
 using Common.Stateful;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Settings.Configuration;
@@ -44,7 +43,7 @@ public static class ObservabilityStartup
 
 	private static void ConfigureLogging(ConfigurationManager configManager)
 	{
-		var loggingConfig = new LoggerConfiguration()
+		LoggerConfiguration loggingConfig = new LoggerConfiguration()
 						.ReadFrom.Configuration(configManager, new ConfigurationReaderOptions() { SectionName = $"{nameof(Observability)}:Serilog" })
 						.Enrich.WithSpan()
 						.Enrich.FromLogContext();

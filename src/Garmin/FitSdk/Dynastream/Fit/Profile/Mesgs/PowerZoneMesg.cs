@@ -13,18 +13,15 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
-using System.IO;
 using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the PowerZone profile message.
-    /// </summary>
-    public class PowerZoneMesg : Mesg
+	/// <summary>
+	/// Implements the PowerZone profile message.
+	/// </summary>
+	public class PowerZoneMesg : Mesg
     {
         #region Fields
         #endregion

@@ -34,10 +34,10 @@ namespace Common.Database
 
 		public Task<SyncServiceStatus> GetSyncStatusAsync()
 		{
-			using var metrics = DbMetrics.DbActionDuration
+			using ITimer metrics = DbMetrics.DbActionDuration
 									.WithLabels("get", DbName)
 									.NewTimer();
-			using var tracing = Tracing.Trace($"{nameof(SyncStatusDb)}.{nameof(GetSyncStatusAsync)}", TagValue.Db)
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(SyncStatusDb)}.{nameof(GetSyncStatusAsync)}", TagValue.Db)
 										.WithTable(DbName);
 
 			try
@@ -58,10 +58,10 @@ namespace Common.Database
 
 		public Task UpsertSyncStatusAsync(SyncServiceStatus status)
 		{
-			using var metrics = DbMetrics.DbActionDuration
+			using ITimer metrics = DbMetrics.DbActionDuration
 									.WithLabels("upsert", DbName)
 									.NewTimer();
-			using var tracing = Tracing.Trace($"{nameof(SyncStatusDb)}.{nameof(UpsertSyncStatusAsync)}", TagValue.Db)
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(SyncStatusDb)}.{nameof(UpsertSyncStatusAsync)}", TagValue.Db)
 										.WithTable(DbName);
 
 			try

@@ -34,7 +34,7 @@ namespace Api.Controllers
 		[ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
 		public async Task<ActionResult<PelotonWorkoutsGetResponse>> GetAsync([FromQuery]PelotonWorkoutsGetRequest request)
 		{
-			if (!request.IsValid(out var result))
+			if (!request.IsValid(out ErrorResponse? result))
 				return new BadRequestObjectResult(result);
 
 			PagedPelotonResponse<Workout>? recentWorkouts = null;
@@ -81,20 +81,20 @@ namespace Api.Controllers
 		[ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
 		public async Task<ActionResult<PelotonWorkoutsGetAllResponse>> GetAsync([FromQuery] PelotonWorkoutsGetAllRequest request)
 		{
-			if (request.SinceDate.IsAfter(DateTime.UtcNow, nameof(request.SinceDate), out var result))
+			if (request.SinceDate.IsAfter(DateTime.UtcNow, nameof(request.SinceDate), out ErrorResponse? result))
 				return new BadRequestObjectResult(result!);
 
 			ICollection<Workout> workoutsToReturn = new List<Workout>();
-			var completedOnly = request.WorkoutStatusFilter == WorkoutStatus.Completed;
+			bool completedOnly = request.WorkoutStatusFilter == WorkoutStatus.Completed;
 
 			try
 			{
-				var serviceResult = await _pelotonService.GetWorkoutsSinceAsync(request.SinceDate);
+				ServiceResult<ICollection<Workout>> serviceResult = await _pelotonService.GetWorkoutsSinceAsync(request.SinceDate);
 
 				if (serviceResult.IsErrored())
 					return serviceResult.GetResultForError();
 
-				foreach (var w in serviceResult.Result)
+				foreach (Workout? w in serviceResult.Result)
 				{
 					if (completedOnly && w.Status != "COMPLETE")
 						continue;

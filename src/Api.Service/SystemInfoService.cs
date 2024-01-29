@@ -32,7 +32,7 @@ public class SystemInfoService : ISystemInfoService
 		if (request.CheckForUpdate)
 			versionInformation = await _versionInformationService.GetLatestReleaseInformationAsync();
 
-		var documentationVersion = versionInformation?.IsInstalledVersionReleaseCandidate ?? true ? "master" : $"v{Constants.AppVersion}";
+		string documentationVersion = versionInformation?.IsInstalledVersionReleaseCandidate ?? true ? "master" : $"v{Constants.AppVersion}";
 
 		var settings = await _settingsService.GetSettingsAsync();
 
@@ -75,7 +75,7 @@ public class SystemInfoService : ISystemInfoService
 			return result;
 		}
 
-		var text = string.Empty;
+		string text = string.Empty;
 		try
 		{
 			using (var sr = new StreamReader(Logging.CurrentFilePath, new FileStreamOptions () { Access = FileAccess.Read, Share = FileShare.ReadWrite }))

@@ -19,8 +19,8 @@ namespace UnitTests.Peloton
 		public async Task GetRecentWorkoutsAsync_DoesNothing_WhenNoCount([Values(-1,0)]int numWorkoutsToDownload)
 		{
 			var autoMocker = new AutoMocker();
-			var pelotonService = autoMocker.CreateInstance<PelotonService>();
-			var pelotonApi = autoMocker.GetMock<IPelotonApi>();
+			PelotonService pelotonService = autoMocker.CreateInstance<PelotonService>();
+			Mock<IPelotonApi> pelotonApi = autoMocker.GetMock<IPelotonApi>();
 
 			await pelotonService.GetRecentWorkoutsAsync(numWorkoutsToDownload);
 
@@ -32,8 +32,8 @@ namespace UnitTests.Peloton
 		{
 			// SETUP
 			var autoMocker = new AutoMocker();
-			var pelotonService = autoMocker.CreateInstance<PelotonService>();
-			var pelotonApi = autoMocker.GetMock<IPelotonApi>();
+			PelotonService pelotonService = autoMocker.CreateInstance<PelotonService>();
+			Mock<IPelotonApi> pelotonApi = autoMocker.GetMock<IPelotonApi>();
 
 			pelotonApi.Setup(x => x.GetWorkoutByIdAsync("1"))
 					.ReturnsAsync(JObject.FromObject(new Workout() { Ride = new Ride() { Id = "12" } }))
@@ -77,15 +77,15 @@ namespace UnitTests.Peloton
 		public async Task GetRecentWorkoutsAsync_FetchesXNumberOfWorkoutsAcrossPages()
 		{
 			var autoMocker = new AutoMocker();
-			var pelotonService = autoMocker.CreateInstance<PelotonService>();
+			PelotonService pelotonService = autoMocker.CreateInstance<PelotonService>();
 
-			var pelotonApi = autoMocker.GetMock<IPelotonApi>();
+			Mock<IPelotonApi> pelotonApi = autoMocker.GetMock<IPelotonApi>();
 			pelotonApi.Setup(x => x.GetWorkoutsAsync(2, 0)) // First call for data
 				.ReturnsAsync(new PagedPelotonResponse<Workout>() { data = new List<Workout>() { new Workout() } });
 			pelotonApi.Setup(x => x.GetWorkoutsAsync(1, 1)) // Second call for data
 				.ReturnsAsync(new PagedPelotonResponse<Workout>() { data = new List<Workout>() { new Workout() } });
 
-			var workouts = await pelotonService.GetRecentWorkoutsAsync(2);
+			ServiceResult<ICollection<Workout>> workouts = await pelotonService.GetRecentWorkoutsAsync(2);
 			workouts.Result.Count.Should().Be(2);
 
 			pelotonApi.Verify(x => x.GetWorkoutsAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(2));
@@ -95,9 +95,9 @@ namespace UnitTests.Peloton
 		public async Task GetRecentWorkoutsAsync_StopsCallingPelotonWhenNoMoreWorkouts()
 		{
 			var autoMocker = new AutoMocker();
-			var pelotonService = autoMocker.CreateInstance<PelotonService>();
+			PelotonService pelotonService = autoMocker.CreateInstance<PelotonService>();
 
-			var pelotonApi = autoMocker.GetMock<IPelotonApi>();
+			Mock<IPelotonApi> pelotonApi = autoMocker.GetMock<IPelotonApi>();
 			pelotonApi.Setup(x => x.GetWorkoutsAsync(20, 0)) // First call for data
 				.ReturnsAsync(new PagedPelotonResponse<Workout>() { data = new List<Workout>() { new Workout() } });
 			pelotonApi.Setup(x => x.GetWorkoutsAsync(19, 1)) // Second call for data
@@ -105,7 +105,7 @@ namespace UnitTests.Peloton
 			pelotonApi.Setup(x => x.GetWorkoutsAsync(18, 2)) // Third call for data
 				.ReturnsAsync(new PagedPelotonResponse<Workout>() { data = new List<Workout>() });
 
-			var workouts = await pelotonService.GetRecentWorkoutsAsync(20);
+			ServiceResult<ICollection<Workout>> workouts = await pelotonService.GetRecentWorkoutsAsync(20);
 			workouts.Result.Count.Should().Be(2);
 
 			pelotonApi.Verify(x => x.GetWorkoutsAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));
@@ -118,13 +118,13 @@ namespace UnitTests.Peloton
 		public async Task GetWorkoutDetailsAsync_Should_Only_Enrich_ValidRideIds(string rideId)
 		{
 			var autoMocker = new AutoMocker();
-			var pelotonService = autoMocker.CreateInstance<PelotonService>();
+			PelotonService pelotonService = autoMocker.CreateInstance<PelotonService>();
 
-			var pelotonApi = autoMocker.GetMock<IPelotonApi>();
+			Mock<IPelotonApi> pelotonApi = autoMocker.GetMock<IPelotonApi>();
 			pelotonApi.Setup(x => x.GetWorkoutByIdAsync("someWorkoutId"))
 				.ReturnsAsync(JObject.FromObject(new Workout() { Ride = new Ride() { Id = rideId } }));
 
-			var workouts = await pelotonService.GetWorkoutDetailsAsync("someWorkoutId");
+			P2GWorkout workouts = await pelotonService.GetWorkoutDetailsAsync("someWorkoutId");
 
 			pelotonApi.Verify(x => x.GetClassSegmentsAsync(It.IsAny<string>()), Times.Never);
 		}

@@ -1,29 +1,18 @@
 ﻿using Common;
 using Common.Dto;
-using Common.Dto.Peloton;
-using Common.Helpers;
-using Common.Http;
 using Common.Service;
 using Conversion;
 using Dynastream.Fit;
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
-using Garmin;
-using Garmin.Auth;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-using Moq;
-using Moq.AutoMock;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using Peloton;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -176,7 +165,7 @@ namespace UnitTests
 
 		private void SaveData(object data, string fileName, string path)
 		{
-			var serializedData = JsonSerializer.Serialize(data, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true, WriteIndented = true });
+			string serializedData = JsonSerializer.Serialize(data, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true, WriteIndented = true });
 			System.IO.File.WriteAllText(Path.Join(path, $"{fileName}_workout.json"), serializedData.ToString());
 		}
 
@@ -201,16 +190,16 @@ namespace UnitTests
 
 			public async Task<ICollection<Mesg>> ConvertForTest(string path, Settings settings)
 			{
-				var workoutData = fileHandler.DeserializeJson<P2GWorkout>(path);
-				var converted = await this.ConvertInternalAsync(workoutData, settings);
+				P2GWorkout workoutData = fileHandler.DeserializeJson<P2GWorkout>(path);
+				Tuple<string, ICollection<Mesg>> converted = await this.ConvertInternalAsync(workoutData, settings);
 
 				return converted.Item2;
 			}
 
 			public async Task<Tuple<string, ICollection<Mesg>>> Convert(string path, Settings settings)
 			{
-				var workoutData = fileHandler.DeserializeJson<P2GWorkout>(path);
-				var converted = await this.ConvertInternalAsync(workoutData, settings);
+				P2GWorkout workoutData = fileHandler.DeserializeJson<P2GWorkout>(path);
+				Tuple<string, ICollection<Mesg>> converted = await this.ConvertInternalAsync(workoutData, settings);
 
 				return converted;
 			}

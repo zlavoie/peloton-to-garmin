@@ -26,10 +26,10 @@ namespace Conversion
 
 		protected override void Save(P2GWorkout data, string path)
 		{
-			using var tracing = Tracing.Trace($"{nameof(FitConverter)}.{nameof(Save)}")
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(FitConverter)}.{nameof(Save)}")
 										.WithTag(TagKey.Format, FileFormat.Json.ToString());
 
-			var serializedData = JsonSerializer.Serialize(data, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true, WriteIndented = true });
+			string serializedData = JsonSerializer.Serialize(data, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true, WriteIndented = true });
 			_fileHandler.WriteToFile(path, serializedData.ToString());
 		}
 	}

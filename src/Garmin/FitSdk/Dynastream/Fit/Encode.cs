@@ -14,17 +14,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using System.IO;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Supports generating binary .FIT files.  Header, Message Definition and Message
-    /// data may be written.
-    /// </summary>
-    public class Encode
+	/// <summary>
+	/// Supports generating binary .FIT files.  Header, Message Definition and Message
+	/// data may be written.
+	/// </summary>
+	public class Encode
     {
         #region Fields
         private MesgDefinition[] lastMesgDef = new MesgDefinition[Fit.MaxLocalMesgs];

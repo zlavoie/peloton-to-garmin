@@ -16,8 +16,8 @@ public static class WorkoutHelper
 
 	public static string GetTitle(Workout workout, Format settings)
 	{
-		var rideTitle = workout.Ride?.Title ?? workout.Id;
-		var instructorName = workout.Ride?.Instructor?.Name;
+		string rideTitle = workout.Ride?.Title ?? workout.Id;
+		string instructorName = workout.Ride?.Instructor?.Name;
 
 		var templateData = new 
 		{
@@ -25,21 +25,21 @@ public static class WorkoutHelper
 			PelotonInstructorName = instructorName
 		};
 
-		var template = settings.WorkoutTitleTemplate;
+		string template = settings.WorkoutTitleTemplate;
 		if (string.IsNullOrWhiteSpace(template))
 			template = new Format().WorkoutTitleTemplate;
-		
-		var compiledTemplate = Handlebars.Compile(settings.WorkoutTitleTemplate);
-		var title = compiledTemplate(templateData);
 
-		var cleanedTitle = title.Replace(Space, SpaceSeparator);
+		HandlebarsTemplate<object, object> compiledTemplate = Handlebars.Compile(settings.WorkoutTitleTemplate);
+		string title = compiledTemplate(templateData);
 
-		foreach (var c in InvalidFileNameChars)
+		string cleanedTitle = title.Replace(Space, SpaceSeparator);
+
+		foreach (char c in InvalidFileNameChars)
 		{
 			cleanedTitle = cleanedTitle.Replace(c, InvalidCharacterReplacer);
 		}
 
-		var result = HttpUtility.HtmlDecode(cleanedTitle);
+		string result = HttpUtility.HtmlDecode(cleanedTitle);
 		return result;
 	}
 
@@ -50,8 +50,8 @@ public static class WorkoutHelper
 
 	public static string GetWorkoutIdFromFileName(string filePath)
 	{
-		var fileName = Path.GetFileNameWithoutExtension(filePath);
-		var parts = fileName.Split(SpaceSeparator);
+		string fileName = Path.GetFileNameWithoutExtension(filePath);
+		string[] parts = fileName.Split(SpaceSeparator);
 		return parts[0];
 	}
 }

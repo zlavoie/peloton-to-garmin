@@ -13,17 +13,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Extends System.Exception to provide application specific exceptions.
-    /// </summary>
-    public class FitException : Exception
+	/// <summary>
+	/// Extends System.Exception to provide application specific exceptions.
+	/// </summary>
+	public class FitException : Exception
     {
         #region Constructors
         public FitException()

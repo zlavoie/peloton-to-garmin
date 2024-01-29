@@ -11,15 +11,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 #endregion
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-
 namespace Dynastream.Fit
 {
-    public interface IMesgBroadcastPlugin
+	public interface IMesgBroadcastPlugin
     {
         void OnBroadcast(object sender, MesgBroadcastEventArgs e);
         void OnIncomingMesg(object sender, IncomingMesgEventArgs e);

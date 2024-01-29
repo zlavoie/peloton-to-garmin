@@ -18,9 +18,9 @@ public class SettingsUpdaterServiceTests
 	public async Task UpdateAppSettingsAsync_With_NullRequest_Returns400()
 	{
 		var autoMocker = new AutoMocker();
-		var service = autoMocker.CreateInstance<SettingsUpdaterService>();
+		SettingsUpdaterService service = autoMocker.CreateInstance<SettingsUpdaterService>();
 
-		var response = await service.UpdateAppSettingsAsync(null);
+		ServiceResult<App> response = await service.UpdateAppSettingsAsync(null);
 
 		response.IsErrored().Should().BeTrue();
 		response.Error.Should().NotBeNull();
@@ -31,9 +31,9 @@ public class SettingsUpdaterServiceTests
 	public async Task UpdateAppSettingsAsync_With_EnablePollingWhenGarminMFAEnabled_Throws()
 	{
 		var autoMocker = new AutoMocker();
-		var service = autoMocker.CreateInstance<SettingsUpdaterService>();
-		var settingService = autoMocker.GetMock<ISettingsService>();
-		var fileHandler = autoMocker.GetMock<IFileHandling>();
+		SettingsUpdaterService service = autoMocker.CreateInstance<SettingsUpdaterService>();
+		Mock<ISettingsService> settingService = autoMocker.GetMock<ISettingsService>();
+		Mock<IFileHandling> fileHandler = autoMocker.GetMock<IFileHandling>();
 
 		fileHandler
 			.Setup(f => f.DirExists("blah"))
@@ -48,7 +48,7 @@ public class SettingsUpdaterServiceTests
 			EnablePolling = true,
 		};
 
-		var response = await service.UpdateAppSettingsAsync(request);
+		ServiceResult<App> response = await service.UpdateAppSettingsAsync(request);
 
 		response.IsErrored().Should().BeTrue();
 		response.Error.Should().NotBeNull();
@@ -59,9 +59,9 @@ public class SettingsUpdaterServiceTests
 	public async Task UpdatePelotonSettingsAsync_With_NullRequest_ReturnsError()
 	{
 		var autoMocker = new AutoMocker();
-		var service = autoMocker.CreateInstance<SettingsUpdaterService>();
+		SettingsUpdaterService service = autoMocker.CreateInstance<SettingsUpdaterService>();
 
-		var response = await service.UpdatePelotonSettingsAsync(null);
+		ServiceResult<SettingsPelotonGetResponse> response = await service.UpdatePelotonSettingsAsync(null);
 
 		response.IsErrored().Should().BeTrue();
 		response.Error.Should().NotBeNull();
@@ -72,8 +72,8 @@ public class SettingsUpdaterServiceTests
 	public async Task UpdatePelotonSettingsAsync_With_Invalid_NumWorkoutsToDownload_And_PollingEnabled_ReturnsError()
 	{
 		var autoMocker = new AutoMocker();
-		var service = autoMocker.CreateInstance<SettingsUpdaterService>();
-		var settingService = autoMocker.GetMock<ISettingsService>();
+		SettingsUpdaterService service = autoMocker.CreateInstance<SettingsUpdaterService>();
+		Mock<ISettingsService> settingService = autoMocker.GetMock<ISettingsService>();
 
 		settingService.SetupWithAny<ISettingsService, Task<Settings>>(nameof(settingService.Object.GetSettingsAsync))
 			.ReturnsAsync(new Settings() { App = new() { EnablePolling = true } });
@@ -83,7 +83,7 @@ public class SettingsUpdaterServiceTests
 			NumWorkoutsToDownload = -1
 		};
 
-		var response = await service.UpdatePelotonSettingsAsync(request);
+		ServiceResult<SettingsPelotonGetResponse> response = await service.UpdatePelotonSettingsAsync(request);
 
 		response.IsErrored().Should().BeTrue();
 		response.Error.Should().NotBeNull();
@@ -94,9 +94,9 @@ public class SettingsUpdaterServiceTests
 	public async Task FormatPost_With_NullRequest_Returns400()
 	{
 		var autoMocker = new AutoMocker();
-		var service = autoMocker.CreateInstance<SettingsUpdaterService>();
+		SettingsUpdaterService service = autoMocker.CreateInstance<SettingsUpdaterService>();
 
-		var response = await service.UpdateFormatSettingsAsync(null);
+		ServiceResult<Format> response = await service.UpdateFormatSettingsAsync(null);
 
 		response.IsErrored().Should().BeTrue();
 		response.Error.Should().NotBeNull();
@@ -107,8 +107,8 @@ public class SettingsUpdaterServiceTests
 	public async Task FormatPost_With_InvalidDeviceInfoPath_Returns400()
 	{
 		var autoMocker = new AutoMocker();
-		var service = autoMocker.CreateInstance<SettingsUpdaterService>();
-		var fileHandler = autoMocker.GetMock<IFileHandling>();
+		SettingsUpdaterService service = autoMocker.CreateInstance<SettingsUpdaterService>();
+		Mock<IFileHandling> fileHandler = autoMocker.GetMock<IFileHandling>();
 
 		fileHandler
 			.Setup(f => f.FileExists("blah"))
@@ -120,7 +120,7 @@ public class SettingsUpdaterServiceTests
 			DeviceInfoPath = "blah"
 		};
 
-		var response = await service.UpdateFormatSettingsAsync(request);
+		ServiceResult<Format> response = await service.UpdateFormatSettingsAsync(request);
 
 		response.IsErrored().Should().BeTrue();
 		response.Error.Should().NotBeNull();
@@ -133,9 +133,9 @@ public class SettingsUpdaterServiceTests
 	public async Task FormatPost_With_EmptyDeviceInfoDir_DoesNotValidateIt()
 	{
 		var autoMocker = new AutoMocker();
-		var service = autoMocker.CreateInstance<SettingsUpdaterService>();
-		var fileHandler = autoMocker.GetMock<IFileHandling>();
-		var settingService = autoMocker.GetMock<ISettingsService>();
+		SettingsUpdaterService service = autoMocker.CreateInstance<SettingsUpdaterService>();
+		Mock<IFileHandling> fileHandler = autoMocker.GetMock<IFileHandling>();
+		Mock<ISettingsService> settingService = autoMocker.GetMock<ISettingsService>();
 
 		var request = new Format()
 		{
@@ -146,7 +146,7 @@ public class SettingsUpdaterServiceTests
 			.Setup(s => s.GetSettingsAsync())
 			.ReturnsAsync(new Settings());
 
-		var response = await service.UpdateFormatSettingsAsync(request);
+		ServiceResult<Format> response = await service.UpdateFormatSettingsAsync(request);
 
 		response.IsErrored().Should().BeFalse();
 		response.Result.Should().NotBeNull();
@@ -158,9 +158,9 @@ public class SettingsUpdaterServiceTests
 	public async Task GarminPost_With_NullRequest_Returns400()
 	{
 		var autoMocker = new AutoMocker();
-		var service = autoMocker.CreateInstance<SettingsUpdaterService>();
+		SettingsUpdaterService service = autoMocker.CreateInstance<SettingsUpdaterService>();
 
-		var response = await service.UpdateGarminSettingsAsync(null);
+		ServiceResult<SettingsGarminGetResponse> response = await service.UpdateGarminSettingsAsync(null);
 
 		response.IsErrored().Should().BeTrue();
 		response.Error.Should().NotBeNull();
@@ -171,8 +171,8 @@ public class SettingsUpdaterServiceTests
 	public async Task GarminPost_With_EnableGarminMFAWhenPollingEnabled_Throws()
 	{
 		var autoMocker = new AutoMocker();
-		var service = autoMocker.CreateInstance<SettingsUpdaterService>();
-		var settingService = autoMocker.GetMock<ISettingsService>();
+		SettingsUpdaterService service = autoMocker.CreateInstance<SettingsUpdaterService>();
+		Mock<ISettingsService> settingService = autoMocker.GetMock<ISettingsService>();
 
 		settingService.SetupWithAny<ISettingsService, Task<Settings>>(nameof(settingService.Object.GetSettingsAsync))
 			.ReturnsAsync(new Settings() { App = new() { EnablePolling = true } });
@@ -183,7 +183,7 @@ public class SettingsUpdaterServiceTests
 			TwoStepVerificationEnabled = true
 		};
 
-		var response = await service.UpdateGarminSettingsAsync(request);
+		ServiceResult<SettingsGarminGetResponse> response = await service.UpdateGarminSettingsAsync(request);
 
 		response.IsErrored().Should().BeTrue();
 		response.Error.Should().NotBeNull();

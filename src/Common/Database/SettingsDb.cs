@@ -37,11 +37,11 @@ namespace Common.Database
 		{
 			try
 			{
-				var settings = _db.GetItem<Settings>("1");
+				Settings settings = _db.GetItem<Settings>("1");
 			}
 			catch (KeyNotFoundException)
 			{
-				var success = _db.InsertItem("1", _defaultSettings);
+				bool success = _db.InsertItem("1", _defaultSettings);
 				if (!success)
 				{
 					_logger.Error($"Failed to init default Settings to Db for default user.");
@@ -51,15 +51,15 @@ namespace Common.Database
 
 		public Settings GetLegacySettings()
 		{
-			using var metrics = DbMetrics.DbActionDuration
+			using ITimer metrics = DbMetrics.DbActionDuration
 									.WithLabels("get", DbName)
 									.NewTimer();
-			using var tracing = Tracing.Trace($"{nameof(SettingsDb)}.{nameof(GetLegacySettings)}", TagValue.Db)
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(SettingsDb)}.{nameof(GetLegacySettings)}", TagValue.Db)
 										.WithTable(DbName);
 
 			try
 			{
-				var settings = _db.GetItem<Settings>("settings");
+				Settings settings = _db.GetItem<Settings>("settings");
 				settings.Peloton.Decrypt();
 				settings.Garmin.Decrypt();
 
@@ -73,15 +73,15 @@ namespace Common.Database
 
 		public Task<Settings> GetSettingsAsync(int userId)
 		{
-			using var metrics = DbMetrics.DbActionDuration
+			using ITimer metrics = DbMetrics.DbActionDuration
 									.WithLabels("get", DbName)
 									.NewTimer();
-			using var tracing = Tracing.Trace($"{nameof(SettingsDb)}.{nameof(GetSettingsAsync)}.ByUserId", TagValue.Db)
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(SettingsDb)}.{nameof(GetSettingsAsync)}.ByUserId", TagValue.Db)
 										.WithTable(DbName);
 
 			try
 			{
-				var settings = _db.GetItem<Settings>(userId.ToString());
+				Settings settings = _db.GetItem<Settings>(userId.ToString());
 				settings.Peloton.Decrypt();
 				settings.Garmin.Decrypt();
 
@@ -96,10 +96,10 @@ namespace Common.Database
 
 		public Task<bool> UpsertSettingsAsync(int userId, Settings settings)
 		{
-			using var metrics = DbMetrics.DbActionDuration
+			using ITimer metrics = DbMetrics.DbActionDuration
 									.WithLabels("upsert", DbName)
 									.NewTimer();
-			using var tracing = Tracing.Trace($"{nameof(SettingsDb)}.{nameof(UpsertSettingsAsync)}", TagValue.Db)
+			using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(SettingsDb)}.{nameof(UpsertSettingsAsync)}", TagValue.Db)
 										.WithTable(DbName);
 
 			try

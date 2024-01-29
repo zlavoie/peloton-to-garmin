@@ -29,10 +29,10 @@ namespace UnitTests.Sync
 			// SETUP
 			var mocker = new AutoMocker();
 
-			var service = mocker.CreateInstance<SyncService>();
-			var peloton = mocker.GetMock<IPelotonService>();
-			var db = mocker.GetMock<ISyncStatusDb>();
-			var settingsService = mocker.GetMock<ISettingsService>();
+			SyncService service = mocker.CreateInstance<SyncService>();
+			Mock<IPelotonService> peloton = mocker.GetMock<IPelotonService>();
+			Mock<ISyncStatusDb> db = mocker.GetMock<ISyncStatusDb>();
+			Mock<ISettingsService> settingsService = mocker.GetMock<ISettingsService>();
 			var settings = new Settings();
 			settings.Format.Fit = true;
 			settings.App.CheckForUpdates = false;
@@ -43,7 +43,7 @@ namespace UnitTests.Sync
 			peloton.Setup(x => x.GetRecentWorkoutsAsync(0)).Throws(new Exception());
 
 			// ACT
-			var response = await service.SyncAsync(0);
+			SyncResult response = await service.SyncAsync(0);
 
 			// ASSERT
 			response.SyncSuccess.Should().BeFalse();
@@ -61,11 +61,11 @@ namespace UnitTests.Sync
 			var mocker = new AutoMocker();
 
 			var config = new Settings();
-			var service = mocker.CreateInstance<SyncService>();
-			var peloton = mocker.GetMock<IPelotonService>();
-			var db = mocker.GetMock<ISyncStatusDb>();
-			var converter = mocker.GetMock<IConverter>();
-			var settingsService = mocker.GetMock<ISettingsService>();
+			SyncService service = mocker.CreateInstance<SyncService>();
+			Mock<IPelotonService> peloton = mocker.GetMock<IPelotonService>();
+			Mock<ISyncStatusDb> db = mocker.GetMock<ISyncStatusDb>();
+			Mock<IConverter> converter = mocker.GetMock<IConverter>();
+			Mock<ISettingsService> settingsService = mocker.GetMock<ISettingsService>();
 			var settings = new Settings();
 			settings.Format.Fit = true;
 			settings.App.CheckForUpdates = false;
@@ -78,7 +78,7 @@ namespace UnitTests.Sync
 			converter.Setup(x => x.ConvertAsync(It.IsAny<P2GWorkout>())).Throws(new Exception());
 
 			// ACT
-			var response = await service.SyncAsync(0);
+			SyncResult response = await service.SyncAsync(0);
 
 			// ASSERT
 			response.SyncSuccess.Should().BeFalse();
@@ -97,12 +97,12 @@ namespace UnitTests.Sync
 			// SETUP
 			var mocker = new AutoMocker();
 
-			var service = mocker.CreateInstance<SyncService>();
-			var peloton = mocker.GetMock<IPelotonService>();
-			var db = mocker.GetMock<ISyncStatusDb>();
-			var converter = mocker.GetMock<IConverter>();
-			var garmin = mocker.GetMock<IGarminUploader>();
-			var settingsService = mocker.GetMock<ISettingsService>();
+			SyncService service = mocker.CreateInstance<SyncService>();
+			Mock<IPelotonService> peloton = mocker.GetMock<IPelotonService>();
+			Mock<ISyncStatusDb> db = mocker.GetMock<ISyncStatusDb>();
+			Mock<IConverter> converter = mocker.GetMock<IConverter>();
+			Mock<IGarminUploader> garmin = mocker.GetMock<IGarminUploader>();
+			Mock<ISettingsService> settingsService = mocker.GetMock<ISettingsService>();
 
 			var settings = new Settings();
 			settings.Format.Fit = true;
@@ -118,7 +118,7 @@ namespace UnitTests.Sync
 			garmin.Setup(x => x.UploadToGarminAsync()).Throws(new Exception());
 
 			// ACT
-			var response = await service.SyncAsync(0);
+			SyncResult response = await service.SyncAsync(0);
 
 			// ASSERT
 			response.SyncSuccess.Should().BeFalse();
@@ -139,13 +139,13 @@ namespace UnitTests.Sync
 			// SETUP
 			var mocker = new AutoMocker();
 
-			var service = mocker.CreateInstance<SyncService>();
-			var peloton = mocker.GetMock<IPelotonService>();
-			var db = mocker.GetMock<ISyncStatusDb>();
-			var converter = mocker.GetMock<IConverter>();
-			var garmin = mocker.GetMock<IGarminUploader>();
-			var fileHandler = mocker.GetMock<IFileHandling>();
-			var settingsService = mocker.GetMock<ISettingsService>();
+			SyncService service = mocker.CreateInstance<SyncService>();
+			Mock<IPelotonService> peloton = mocker.GetMock<IPelotonService>();
+			Mock<ISyncStatusDb> db = mocker.GetMock<ISyncStatusDb>();
+			Mock<IConverter> converter = mocker.GetMock<IConverter>();
+			Mock<IGarminUploader> garmin = mocker.GetMock<IGarminUploader>();
+			Mock<IFileHandling> fileHandler = mocker.GetMock<IFileHandling>();
+			Mock<ISettingsService> settingsService = mocker.GetMock<ISettingsService>();
 
 			var settings = new Settings();
 			settings.Format.Fit = true;
@@ -160,7 +160,7 @@ namespace UnitTests.Sync
 			peloton.Setup(x => x.GetWorkoutDetailsAsync(It.IsAny<ICollection<Workout>>())).ReturnsAsync(new P2GWorkout[] { new P2GWorkout() });
 
 			// ACT
-			var response = await service.SyncAsync(0);
+			SyncResult response = await service.SyncAsync(0);
 
 			// ASSERT
 			response.SyncSuccess.Should().BeTrue();
@@ -182,13 +182,13 @@ namespace UnitTests.Sync
 			// SETUP
 			var mocker = new AutoMocker();
 
-			var service = mocker.CreateInstance<SyncService>();
-			var peloton = mocker.GetMock<IPelotonService>();
-			var db = mocker.GetMock<ISyncStatusDb>();
-			var converter = mocker.GetMock<IConverter>();
-			var garmin = mocker.GetMock<IGarminUploader>();
-			var fileHandler = mocker.GetMock<IFileHandling>();
-			var settingsService = mocker.GetMock<ISettingsService>();
+			SyncService service = mocker.CreateInstance<SyncService>();
+			Mock<IPelotonService> peloton = mocker.GetMock<IPelotonService>();
+			Mock<ISyncStatusDb> db = mocker.GetMock<ISyncStatusDb>();
+			Mock<IConverter> converter = mocker.GetMock<IConverter>();
+			Mock<IGarminUploader> garmin = mocker.GetMock<IGarminUploader>();
+			Mock<IFileHandling> fileHandler = mocker.GetMock<IFileHandling>();
+			Mock<ISettingsService> settingsService = mocker.GetMock<ISettingsService>();
 
 			var settings = new Settings();
 			settings.Format.Fit = true;
@@ -210,7 +210,7 @@ namespace UnitTests.Sync
 				.Verifiable();
 
 			// ACT
-			var response = await service.SyncAsync(0);
+			SyncResult response = await service.SyncAsync(0);
 
 			// ASSERT
 			response.SyncSuccess.Should().BeTrue();
@@ -232,13 +232,13 @@ namespace UnitTests.Sync
 			// SETUP
 			var mocker = new AutoMocker();
 
-			var service = mocker.CreateInstance<SyncService>();
-			var peloton = mocker.GetMock<IPelotonService>();
-			var db = mocker.GetMock<ISyncStatusDb>();
-			var converter = mocker.GetMock<IConverter>();
-			var garmin = mocker.GetMock<IGarminUploader>();
-			var fileHandler = mocker.GetMock<IFileHandling>();
-			var settingsService = mocker.GetMock<ISettingsService>();
+			SyncService service = mocker.CreateInstance<SyncService>();
+			Mock<IPelotonService> peloton = mocker.GetMock<IPelotonService>();
+			Mock<ISyncStatusDb> db = mocker.GetMock<ISyncStatusDb>();
+			Mock<IConverter> converter = mocker.GetMock<IConverter>();
+			Mock<IGarminUploader> garmin = mocker.GetMock<IGarminUploader>();
+			Mock<IFileHandling> fileHandler = mocker.GetMock<IFileHandling>();
+			Mock<ISettingsService> settingsService = mocker.GetMock<ISettingsService>();
 
 			var settings = new Settings();
 			settings.Format.Fit = true;
@@ -259,7 +259,7 @@ namespace UnitTests.Sync
 					.Verifiable();
 
 			// ACT
-			var response = await service.SyncAsync(5);
+			SyncResult response = await service.SyncAsync(5);
 
 			// ASSERT
 			response.SyncSuccess.Should().BeTrue();
@@ -281,11 +281,11 @@ namespace UnitTests.Sync
 			// SETUP
 			var mocker = new AutoMocker();
 
-			var service = mocker.CreateInstance<SyncService>();
-			var peloton = mocker.GetMock<IPelotonService>();
-			var db = mocker.GetMock<ISyncStatusDb>();
-			var settingsService = mocker.GetMock<ISettingsService>();
-			var ghService = mocker.GetMock<IGitHubReleaseCheckService>();
+			SyncService service = mocker.CreateInstance<SyncService>();
+			Mock<IPelotonService> peloton = mocker.GetMock<IPelotonService>();
+			Mock<ISyncStatusDb> db = mocker.GetMock<ISyncStatusDb>();
+			Mock<ISettingsService> settingsService = mocker.GetMock<ISettingsService>();
+			Mock<IGitHubReleaseCheckService> ghService = mocker.GetMock<IGitHubReleaseCheckService>();
 
 			var settings = new Settings();
 			settings.App.CheckForUpdates = false;
@@ -299,7 +299,7 @@ namespace UnitTests.Sync
 				.ReturnsAsync(new LatestReleaseInformation());
 
 			// ACT
-			var response = await service.SyncAsync(0);
+			SyncResult response = await service.SyncAsync(0);
 
 			// ASSERT
 			ghService.Verify(x => x.GetLatestReleaseInformationAsync("philosowaffle", "peloton-to-garmin", Constants.AppVersion), Times.Never);
@@ -311,13 +311,13 @@ namespace UnitTests.Sync
 			// SETUP
 			var mocker = new AutoMocker();
 
-			var service = mocker.CreateInstance<SyncService>();
-			var peloton = mocker.GetMock<IPelotonService>();
-			var db = mocker.GetMock<ISyncStatusDb>();
-			var converter = mocker.GetMock<IConverter>();
-			var garmin = mocker.GetMock<IGarminUploader>();
-			var fileHandler = mocker.GetMock<IFileHandling>();
-			var settingsService = mocker.GetMock<ISettingsService>();
+			SyncService service = mocker.CreateInstance<SyncService>();
+			Mock<IPelotonService> peloton = mocker.GetMock<IPelotonService>();
+			Mock<ISyncStatusDb> db = mocker.GetMock<ISyncStatusDb>();
+			Mock<IConverter> converter = mocker.GetMock<IConverter>();
+			Mock<IGarminUploader> garmin = mocker.GetMock<IGarminUploader>();
+			Mock<IFileHandling> fileHandler = mocker.GetMock<IFileHandling>();
+			Mock<ISettingsService> settingsService = mocker.GetMock<ISettingsService>();
 
 			var settings = new Settings();
 			settings.Format.Fit = true;
@@ -335,7 +335,7 @@ namespace UnitTests.Sync
 			peloton.Setup(x => x.GetWorkoutDetailsAsync(It.IsAny<ICollection<Workout>>())).ReturnsAsync(new P2GWorkout[] { p2gWorkout });
 
 			// ACT
-			var response = await service.SyncAsync(0);
+			SyncResult response = await service.SyncAsync(0);
 
 			// ASSERT
 			response.SyncSuccess.Should().BeTrue();

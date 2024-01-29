@@ -13,18 +13,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the Monitoring profile message.
-    /// </summary>
-    public class MonitoringMesg : Mesg
+	/// <summary>
+	/// Implements the Monitoring profile message.
+	/// </summary>
+	public class MonitoringMesg : Mesg
     {
         #region Fields
         static class CyclesSubfield

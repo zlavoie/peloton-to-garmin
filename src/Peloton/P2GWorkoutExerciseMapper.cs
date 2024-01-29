@@ -9,20 +9,20 @@ public static class P2GWorkoutExerciseMapper
 {
 	public static ICollection<P2GExercise> GetWorkoutExercises(Workout workout, RideSegments rideSegments)
 	{
-		var exercises = GetExercisesTrackedByMovementTracker(workout);
+		ICollection<P2GExercise> exercises = GetExercisesTrackedByMovementTracker(workout);
 
-		var segments = rideSegments?.Segments?.Segment_List;
+		ICollection<Segment> segments = rideSegments?.Segments?.Segment_List;
 		if (segments is null || segments.Count <= 0) return exercises;
 
-		foreach (var segment in segments)
+		foreach (Segment segment in segments)
 		{
 			if (segment?.SubSegments_V2 is null || segment.SubSegments_V2.Count <= 0) continue;
 
-			foreach (var subSegment in segment.SubSegments_V2)
+			foreach (SubSegment subSegment in segment.SubSegments_V2)
 			{
 				if (subSegment?.Movements is null || subSegment.Movements.Count <= 0) continue;
 
-				foreach (var movement in subSegment.Movements)
+				foreach (Movement movement in subSegment.Movements)
 				{
 					if (movement is null) continue;
 
@@ -51,10 +51,10 @@ public static class P2GWorkoutExerciseMapper
 	{
 		var movements = new List<P2GExercise>();
 
-		var trackedRepData = workout?.Movement_Tracker_Data?.Completed_Movements_Summary_Data?.Repetition_Summary_Data;
+		ICollection<RepetitionSummaryData> trackedRepData = workout?.Movement_Tracker_Data?.Completed_Movements_Summary_Data?.Repetition_Summary_Data;
 		if (trackedRepData is not null && trackedRepData.Count > 0)
 		{
-			foreach (var repData in trackedRepData)
+			foreach (RepetitionSummaryData repData in trackedRepData)
 			{
 				var movement = new P2GExercise()
 				{

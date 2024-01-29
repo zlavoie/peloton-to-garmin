@@ -13,18 +13,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the AccelerometerData profile message.
-    /// </summary>
-    public class AccelerometerDataMesg : Mesg
+	/// <summary>
+	/// Implements the AccelerometerData profile message.
+	/// </summary>
+	public class AccelerometerDataMesg : Mesg
     {
         #region Fields
         #endregion

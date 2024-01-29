@@ -58,7 +58,7 @@ public class WorkoutHelperTests
 			Id = "someId"
 		};
 
-		var title = WorkoutHelper.GetTitle(workout, new Format());
+		string title = WorkoutHelper.GetTitle(workout, new Format());
 		title.Should().Be("someId");
 	}
 
@@ -73,7 +73,7 @@ public class WorkoutHelperTests
 			}
 		};
 
-		var title = WorkoutHelper.GetTitle(workout, new Format());
+		string title = WorkoutHelper.GetTitle(workout, new Format());
 		title.Should().Be("My_Title");
 	}
 
@@ -89,7 +89,7 @@ public class WorkoutHelperTests
 			}
 		};
 
-		var title = WorkoutHelper.GetTitle(workout, new Format());
+		string title = WorkoutHelper.GetTitle(workout, new Format());
 		title.Should().Be("My_Title");
 	}
 
@@ -105,7 +105,7 @@ public class WorkoutHelperTests
 			}
 		};
 
-		var title = WorkoutHelper.GetTitle(workout, new Format());
+		string title = WorkoutHelper.GetTitle(workout, new Format());
 		title.Should().Be("My_Title_with_Instructor");
 	}
 
@@ -126,7 +126,7 @@ public class WorkoutHelperTests
 			}
 		};
 
-		var title = WorkoutHelper.GetTitle(workout, format);
+		string title = WorkoutHelper.GetTitle(workout, format);
 		title.Should().Be("Instructor_-_My_Title");
 	}
 }

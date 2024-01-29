@@ -1,5 +1,4 @@
 ﻿using Common.Dto;
-using Common.Stateful;
 using Prometheus;
 using Prometheus.DotNetRuntime;
 using Serilog;
@@ -15,7 +14,7 @@ namespace Common.Observe
 			IMetricServer metricsServer = null;
 			if (config.Enabled)
 			{
-				var port = config.Port ?? 4000;
+				int port = config.Port ?? 4000;
 				metricsServer = new KestrelMetricServer(port: port);
 				metricsServer.Start();
 

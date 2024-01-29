@@ -12,18 +12,12 @@
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.IO;
-
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements Dynastream CRC16 function
-    /// </summary>
-    public static class CRC
+	/// <summary>
+	/// Implements Dynastream CRC16 function
+	/// </summary>
+	public static class CRC
     {
         private static ushort[] crcTable = new ushort[]
         {

@@ -143,7 +143,7 @@ namespace ActivityEncode
 			var activityMesg = new ActivityMesg();
 			activityMesg.SetTimestamp(timestamp);
 			activityMesg.SetNumSessions(1);
-			var timezoneOffset = (int)TimeZoneInfo.Local.BaseUtcOffset.TotalSeconds;
+			int timezoneOffset = (int)TimeZoneInfo.Local.BaseUtcOffset.TotalSeconds;
 			activityMesg.SetLocalTimestamp((uint)((int)timestamp.GetTimeStamp() + timezoneOffset));
 			activityMesg.SetTotalTimerTime(timestamp.GetTimeStamp() - startTime.GetTimeStamp());
 			messages.Add(activityMesg);
@@ -228,12 +228,12 @@ namespace ActivityEncode
 			ushort lapTotalStrokes = 0;
 			var lapStartTime = new Dynastream.Fit.DateTime(startTime);
 
-			var poolLength = 22.86f;
-			var poolLengthUnit = DisplayMeasure.Statute;
+			float poolLength = 22.86f;
+			DisplayMeasure poolLengthUnit = DisplayMeasure.Statute;
 			var timestamp = new Dynastream.Fit.DateTime(startTime);
 			ushort messageIndex = 0;
 
-			foreach(var swimLength in swimData)
+			foreach(Dictionary<string, object> swimLength in swimData)
 			{
 				string type = (string)swimLength["type"];
 
@@ -365,7 +365,7 @@ namespace ActivityEncode
 			var activityMesg = new ActivityMesg();
 			activityMesg.SetTimestamp(timestamp);
 			activityMesg.SetNumSessions(1);
-			var timezoneOffset = (int)TimeZoneInfo.Local.BaseUtcOffset.TotalSeconds;
+			int timezoneOffset = (int)TimeZoneInfo.Local.BaseUtcOffset.TotalSeconds;
 			activityMesg.SetLocalTimestamp((uint)((int)timestamp.GetTimeStamp() + timezoneOffset));
 			activityMesg.SetTotalTimerTime(sessionTotalElapsedTime);
 			messages.Add(activityMesg);

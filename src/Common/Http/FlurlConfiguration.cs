@@ -51,8 +51,8 @@ public static class FlurlConfiguration
 		};
 
 		Func<FlurlCall, Task> onErrorAsync = async (call) => {
-			var request = call.GetRawRequestBody();
-			var response = await call.GetRawResponseBodyAsync();
+			string request = call.GetRawRequestBody();
+			string response = await call.GetRawResponseBodyAsync();
 			LogError(call, request, response);
 		};
 
@@ -67,7 +67,7 @@ public static class FlurlConfiguration
 
 		FlurlHttp.ConfigureClient("https://api.onepeloton.com", client =>
 		{
-			var policies = Policy.WrapAsync(PollyPolicies.Retry, PollyPolicies.NoOp);
+			Polly.Wrap.AsyncPolicyWrap<System.Net.Http.HttpResponseMessage> policies = Policy.WrapAsync(PollyPolicies.Retry, PollyPolicies.NoOp);
 			client.Settings.HttpClientFactory = new PollyHttpClientFactory(policies);
 		});
 	}
@@ -170,20 +170,20 @@ public static class FlurlConfiguration
 			if (PrometheusEnabled)
 			{
 				var url = new Url(call.HttpRequestMessage.RequestUri);
-				var queryParamKeys = url.QueryParams
+				IEnumerable<string> queryParamKeys = url.QueryParams
 										.Select(y => y.Name);
-				var queryParamMetric = string.Join('&', queryParamKeys);
+				string queryParamMetric = string.Join('&', queryParamKeys);
 
-				var pathSegments = url.PathSegments;
+				IList<string> pathSegments = url.PathSegments;
 				var metricsSegments = new List<string>(pathSegments.Count);
-				foreach (var segment in pathSegments)
+				foreach (string segment in pathSegments)
 				{
 					if (segment.Any(char.IsNumber))
 						metricsSegments.Add("{dynamic}");
 					else
 						metricsSegments.Add(segment);
 				}
-				var cleansedUrl = new Url("http://temp")
+				Url cleansedUrl = new Url("http://temp")
 									.AppendPathSegments(metricsSegments);
 
 				TrackMetrics(call, HttpUtility.UrlDecode(cleansedUrl.Path), queryParamMetric);
@@ -220,7 +220,7 @@ public static class FlurlConfiguration
 			{
 				if (Log.IsEnabled(LogEventLevel.Verbose))
 				{
-					var content = call.GetRawRequestBody()
+					string content = call.GetRawRequestBody()
 									?.Replace(sensitiveField, "<redacted1>")
 									?.Replace(sensitiveField2, "<redacted2>") ?? string.Empty;
 
@@ -234,7 +234,7 @@ public static class FlurlConfiguration
 			{
 				if (Log.IsEnabled(LogEventLevel.Verbose))
 				{
-					var content = (await call.GetRawResponseBodyAsync())
+					string content = (await call.GetRawResponseBodyAsync())
 									?.Replace(sensitiveField, "<redacted1>")
 									?.Replace(sensitiveField2, "<redacted2>") ?? string.Empty;
 
@@ -247,12 +247,12 @@ public static class FlurlConfiguration
 			c.OnErrorAsync = null;
 			c.OnErrorAsync = async (call) =>
 			{
-				var requestContent = call.GetRawRequestBody()
+				string requestContent = call.GetRawRequestBody()
 									?.ToString()
 									?.Replace(sensitiveField, "<redacted1>")
 									?.Replace(sensitiveField2, "<redacted2>") ?? string.Empty;
 
-				var responseContent = (await call.GetRawResponseBodyAsync())
+				string responseContent = (await call.GetRawResponseBodyAsync())
 								?.Replace(sensitiveField, "<redacted1>")
 								?.Replace(sensitiveField2, "<redacted2>") ?? string.Empty;
 
@@ -263,7 +263,7 @@ public static class FlurlConfiguration
 
 	private static string GetRawRequestBody(this FlurlCall call)
 	{
-		var request = string.Empty;
+		string request = string.Empty;
 		if (call.HttpRequestMessage is object
 			&& call.HttpRequestMessage.Content is object)
 			request = call.HttpRequestMessage.Content.ToString() ?? string.Empty;
@@ -273,7 +273,7 @@ public static class FlurlConfiguration
 
 	private static async Task<string> GetRawResponseBodyAsync(this FlurlCall call)
 	{
-		var responseBody = string.Empty;
+		string responseBody = string.Empty;
 		if (call.HttpResponseMessage is object
 			&& call.HttpResponseMessage.Content is object)
 			responseBody = await call.HttpResponseMessage.Content.ReadAsStringAsync() ?? string.Empty;

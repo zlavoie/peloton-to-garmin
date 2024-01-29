@@ -1,6 +1,5 @@
 ﻿#pragma warning disable CS0612 // Type or member is obsolete
 
-using Common;
 using Common.Database;
 using Common.Dto;
 using Common.Dto.P2G;
@@ -19,8 +18,8 @@ public class DbMigrationsTests
 	public async Task MigrateToAdminUserAsync_When_NoLegacySettings_NoOp()
 	{
 		var mocker = new AutoMocker();
-		var service = mocker.CreateInstance<DbMigrations>();
-		var settingsDb = mocker.GetMock<ISettingsDb>();
+		DbMigrations service = mocker.CreateInstance<DbMigrations>();
+		Mock<ISettingsDb> settingsDb = mocker.GetMock<ISettingsDb>();
 
 		settingsDb.Setup(x => x.GetLegacySettings())
 			.Returns((Settings)null)
@@ -39,9 +38,9 @@ public class DbMigrationsTests
 	public async Task MigrateToAdminUserAsync_When_LegacySettings_Migrates()
 	{
 		var mocker = new AutoMocker();
-		var service = mocker.CreateInstance<DbMigrations>();
-		var settingsDb = mocker.GetMock<ISettingsDb>();
-		var usersDb = mocker.GetMock<IUsersDb>();
+		DbMigrations service = mocker.CreateInstance<DbMigrations>();
+		Mock<ISettingsDb> settingsDb = mocker.GetMock<ISettingsDb>();
+		Mock<IUsersDb> usersDb = mocker.GetMock<IUsersDb>();
 
 		var settings = new Settings()
 		{
@@ -71,9 +70,9 @@ public class DbMigrationsTests
 	public async Task MigrateToAdminUserAsync_When_FailsToMigrate_DoesNotThrow()
 	{
 		var mocker = new AutoMocker();
-		var service = mocker.CreateInstance<DbMigrations>();
-		var settingsDb = mocker.GetMock<ISettingsDb>();
-		var usersDb = mocker.GetMock<IUsersDb>();
+		DbMigrations service = mocker.CreateInstance<DbMigrations>();
+		Mock<ISettingsDb> settingsDb = mocker.GetMock<ISettingsDb>();
+		Mock<IUsersDb> usersDb = mocker.GetMock<IUsersDb>();
 
 		var settings = new Settings()
 		{

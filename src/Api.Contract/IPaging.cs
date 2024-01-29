@@ -1,7 +1,4 @@
-﻿using Common.Helpers;
-using Microsoft.AspNetCore.Mvc;
-
-namespace Api.Contract;
+﻿namespace Api.Contract;
 
 public interface IPagingRequest
 {

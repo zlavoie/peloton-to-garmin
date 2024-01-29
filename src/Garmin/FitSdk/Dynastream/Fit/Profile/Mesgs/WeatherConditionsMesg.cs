@@ -13,18 +13,15 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
-using System.IO;
 using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the WeatherConditions profile message.
-    /// </summary>
-    public class WeatherConditionsMesg : Mesg
+	/// <summary>
+	/// Implements the WeatherConditions profile message.
+	/// </summary>
+	public class WeatherConditionsMesg : Mesg
     {
         #region Fields
         #endregion

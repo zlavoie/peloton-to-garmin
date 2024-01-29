@@ -15,12 +15,10 @@
 #endregion
 
 using System;
-using System.Globalization;
-using System.IO;
 
 namespace Dynastream.Fit
 {
-    public class DeveloperFieldDescription
+	public class DeveloperFieldDescription
     {
         private readonly DeveloperDataIdMesg m_developerDataId;
         private readonly FieldDescriptionMesg m_fieldDescription;

@@ -2,7 +2,6 @@
 using Common;
 using Common.Dto;
 using Common.Service;
-using Common.Stateful;
 
 namespace Api.Service;
 

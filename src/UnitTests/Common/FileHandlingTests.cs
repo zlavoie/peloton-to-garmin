@@ -18,9 +18,9 @@ namespace UnitTests.Common
 		public void TryDeserializeXml_Deserializes()
 		{
 			var autoMocker = new AutoMocker();
-			var fileHandler = autoMocker.CreateInstance<IOWrapper>();
+			IOWrapper fileHandler = autoMocker.CreateInstance<IOWrapper>();
 
-			var success = fileHandler.TryDeserializeXml<GarminDeviceInfo>(DeviceInfoPath, out var deserialized);
+			bool success = fileHandler.TryDeserializeXml<GarminDeviceInfo>(DeviceInfoPath, out GarminDeviceInfo deserialized);
 			
 			success.Should().BeTrue();
 			deserialized.Should().NotBeNull();
@@ -30,9 +30,9 @@ namespace UnitTests.Common
 		public void TryDeserializeXml_ReturnsFalse_ForInvalidFile()
 		{
 			var autoMocker = new AutoMocker();
-			var fileHandler = autoMocker.CreateInstance<IOWrapper>();
+			IOWrapper fileHandler = autoMocker.CreateInstance<IOWrapper>();
 
-			var success = fileHandler.TryDeserializeXml<GarminDeviceInfo>(BadDeviceInfoPath, out var deserialized);
+			bool success = fileHandler.TryDeserializeXml<GarminDeviceInfo>(BadDeviceInfoPath, out GarminDeviceInfo deserialized);
 
 			success.Should().BeFalse();
 			deserialized.Should().BeNull();
@@ -42,11 +42,11 @@ namespace UnitTests.Common
 		public void TryDeserializeXml_Validate_Async_ReadAccess()
 		{
 			var autoMocker = new AutoMocker();
-			var fileHandler = autoMocker.CreateInstance<IOWrapper>();
+			IOWrapper fileHandler = autoMocker.CreateInstance<IOWrapper>();
 
 			Parallel.For(0, 10, (itr, loopState) =>
 			{
-				var success = fileHandler.TryDeserializeXml<GarminDeviceInfo>(DeviceInfoPath, out var deserialized);
+				bool success = fileHandler.TryDeserializeXml<GarminDeviceInfo>(DeviceInfoPath, out GarminDeviceInfo deserialized);
 				success.Should().BeTrue();
 				deserialized.Should().NotBeNull();
 			});

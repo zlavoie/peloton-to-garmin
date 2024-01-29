@@ -34,19 +34,19 @@ public class DbMigrations : IDbMigrations
 
 	public async Task MigrateToAdminUserAsync()
 	{
-		#pragma warning disable CS0612 // Type or member is obsolete
-		var legacySettings = _settingsDb.GetLegacySettings();
+#pragma warning disable CS0612 // Type or member is obsolete
+		Dto.Settings legacySettings = _settingsDb.GetLegacySettings();
 
 		if (legacySettings is null) return;
 
 		_logger.Information("[MIGRATION] Migrating settings to Admin user...");
 
-		var users = await _usersDb.GetUsersAsync();
-		var admin = users.First();
+		System.Collections.Generic.ICollection<Dto.P2G.P2GUser> users = await _usersDb.GetUsersAsync();
+		Dto.P2G.P2GUser admin = users.First();
 
 		try
 		{
-			var success = await _settingsDb.UpsertSettingsAsync(admin.Id, legacySettings);
+			bool success = await _settingsDb.UpsertSettingsAsync(admin.Id, legacySettings);
 			if (success)
 			{
 				await _settingsDb.RemoveLegacySettingsAsync();
@@ -75,8 +75,8 @@ public class DbMigrations : IDbMigrations
 
 	public async Task MigrateToEncryptedCredentialsAsync()
 	{
-		var admin = (await _usersDb.GetUsersAsync()).First();
-		var settings = await _settingsDb!.GetSettingsAsync(admin.Id);
+		Dto.P2G.P2GUser admin = (await _usersDb.GetUsersAsync()).First();
+		Dto.Settings settings = await _settingsDb!.GetSettingsAsync(admin.Id);
 
 		if (settings.Peloton.EncryptionVersion == EncryptionVersion.V1
 			&& settings.Garmin.EncryptionVersion == EncryptionVersion.V1)

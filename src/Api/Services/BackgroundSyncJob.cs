@@ -1,5 +1,4 @@
-﻿using Common;
-using Common.Database;
+﻿using Common.Database;
 using Common.Dto;
 using Common.Observe;
 using Common.Service;
@@ -83,7 +82,7 @@ public class BackgroundSyncJob : BackgroundService
 
 	private async Task<bool> StateChangedAsync()
 	{
-		using var tracing = Tracing.Trace($"{nameof(BackgroundService)}.{nameof(StateChangedAsync)}");
+		using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(BackgroundService)}.{nameof(StateChangedAsync)}");
 
 		_config = await _settingsService.GetSettingsAsync();
 		SyncServiceState.Enabled = _config.App.EnablePolling;
@@ -94,11 +93,11 @@ public class BackgroundSyncJob : BackgroundService
 
 	private async Task<bool> NotPollingAsync()
 	{
-		using var tracing = Tracing.Trace($"{nameof(BackgroundService)}.{nameof(NotPollingAsync)}");
+		using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(BackgroundService)}.{nameof(NotPollingAsync)}");
 
 		if (await StateChangedAsync())
 		{
-			var syncTime = await _syncStatusDb.GetSyncStatusAsync();
+			SyncServiceStatus syncTime = await _syncStatusDb.GetSyncStatusAsync();
 			syncTime.NextSyncTime = SyncServiceState.Enabled ? DateTime.Now : null;
 			syncTime.SyncStatus = SyncServiceState.Enabled ? Status.Running : Status.NotRunning;
 			await _syncStatusDb.UpsertSyncStatusAsync(syncTime);
@@ -113,11 +112,11 @@ public class BackgroundSyncJob : BackgroundService
 
 	private async Task SyncAsync()
 	{
-		using var tracing = Tracing.Trace($"{nameof(BackgroundService)}.{nameof(SyncAsync)}");
+		using System.Diagnostics.Activity tracing = Tracing.Trace($"{nameof(BackgroundService)}.{nameof(SyncAsync)}");
 
 		try
 		{
-			var result = await _syncService.SyncAsync(_config.Peloton.NumWorkoutsToDownload);
+			SyncResult result = await _syncService.SyncAsync(_config.Peloton.NumWorkoutsToDownload);
 			if(result.SyncSuccess)
 			{
 				Health.Set(HealthStatus.Healthy);
@@ -132,10 +131,10 @@ public class BackgroundSyncJob : BackgroundService
 
 		} finally
 		{
-			var now = DateTime.UtcNow;
-			var nextRunTime = now.AddSeconds(_config.App.PollingIntervalSeconds);
+			DateTime now = DateTime.UtcNow;
+			DateTime nextRunTime = now.AddSeconds(_config.App.PollingIntervalSeconds);
 
-			var syncStatus = await _syncStatusDb.GetSyncStatusAsync();
+			SyncServiceStatus syncStatus = await _syncStatusDb.GetSyncStatusAsync();
 			syncStatus.NextSyncTime = nextRunTime;
 			syncStatus.SyncStatus = Health.Value == HealthStatus.UnHealthy ? Status.UnHealthy :
 									Status.Running;

@@ -19,9 +19,9 @@ Statics.ConfigPath = Path.Join(Environment.CurrentDirectory, "configuration.loca
 ///////////////////////////////////////////////////////////
 /// HOST
 ///////////////////////////////////////////////////////////
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-var configProvider = builder.Configuration.AddJsonFile(Statics.ConfigPath, optional: true, reloadOnChange: true)
+IConfigurationBuilder configProvider = builder.Configuration.AddJsonFile(Statics.ConfigPath, optional: true, reloadOnChange: true)
 				.AddEnvironmentVariables(prefix: "P2G_")
 				.AddCommandLine(args);
 
@@ -42,12 +42,12 @@ builder.Services.AddSwaggerGen(c =>
 {
 	c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "P2G API", Version = "v1" });
 	var executingAssembly = Assembly.GetExecutingAssembly();
-	var referencedAssemblies = executingAssembly.GetReferencedAssemblies();
-	var docPaths = referencedAssemblies
+	AssemblyName[] referencedAssemblies = executingAssembly.GetReferencedAssemblies();
+	string[] docPaths = referencedAssemblies
 					.Union(new AssemblyName[] { executingAssembly.GetName() })
 					.Select(a => Path.Combine(AppContext.BaseDirectory, $"{a.Name}.xml"))
 					.Where(f => File.Exists(f)).ToArray();
-	foreach (var docPath in docPaths)
+	foreach (string? docPath in docPaths)
 		c.IncludeXmlComments(docPath);
 });
 
@@ -60,7 +60,7 @@ Common.Observe.Metrics.CreateAppInfo();
 /// APP
 ///////////////////////////////////////////////////////////
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (Log.IsEnabled(LogEventLevel.Verbose))
 	app.UseSerilogRequestLogging();
@@ -97,7 +97,7 @@ app.MapControllers();
 ///////////////////////////////////////////////////////////
 /// MIGRATIONS
 ///////////////////////////////////////////////////////////
-var migrationService = app.Services.GetService<IDbMigrations>();
+IDbMigrations? migrationService = app.Services.GetService<IDbMigrations>();
 await migrationService!.PreformMigrations();
 
 ///////////////////////////////////////////////////////////

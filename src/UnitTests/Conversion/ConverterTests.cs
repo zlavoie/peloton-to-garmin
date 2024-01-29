@@ -21,19 +21,19 @@ namespace UnitTests.Conversion
 		public void GetStartTimeTest()
 		{
 			var epoch = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-			var nowCst = System.DateTime.Now;
+			System.DateTime nowCst = System.DateTime.Now;
 			TimeSpan diff = nowCst.ToUniversalTime() - epoch;
-			var seconds = (long)Math.Floor(diff.TotalSeconds);
+			long seconds = (long)Math.Floor(diff.TotalSeconds);
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
 			var wokout = new Workout()
 			{
 				Start_Time = seconds
 			};
 
-			var startTime = converter.GetStartTime1(wokout);
+			System.DateTime startTime = converter.GetStartTime1(wokout);
 			startTime.Should().BeCloseTo(nowCst.ToUniversalTime(), new TimeSpan(0,0,59));
 		}
 
@@ -41,12 +41,12 @@ namespace UnitTests.Conversion
 		public void GetEndTimeTest()
 		{
 			var epoch = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-			var nowCst = System.DateTime.Now;
+			System.DateTime nowCst = System.DateTime.Now;
 			TimeSpan diff = nowCst.ToUniversalTime() - epoch;
-			var seconds = (long)Math.Floor(diff.TotalSeconds);
+			long seconds = (long)Math.Floor(diff.TotalSeconds);
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
 			var workoutSamples = new WorkoutSamples();
 			var wokout = new Workout()
@@ -54,7 +54,7 @@ namespace UnitTests.Conversion
 				End_Time = seconds
 			};
 
-			var endTime = converter.GetEndTimeUtc1(wokout, workoutSamples);
+			System.DateTime endTime = converter.GetEndTimeUtc1(wokout, workoutSamples);
 			endTime.Should().BeCloseTo(nowCst.ToUniversalTime(), new TimeSpan(0, 0, 59));
 		}
 
@@ -62,12 +62,12 @@ namespace UnitTests.Conversion
 		public void GetEndTime_FallsbackToDuration_Test()
 		{
 			var epoch = new System.DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-			var nowCst = System.DateTime.Now;
+			System.DateTime nowCst = System.DateTime.Now;
 			TimeSpan diff = nowCst.ToUniversalTime() - epoch;
-			var seconds = (long)Math.Floor(diff.TotalSeconds);
+			long seconds = (long)Math.Floor(diff.TotalSeconds);
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
 			var wokout = new Workout()
 			{
@@ -80,7 +80,7 @@ namespace UnitTests.Conversion
 				Duration = 500
 			};
 
-			var endTime = converter.GetEndTimeUtc1(wokout, workoutSamples);
+			System.DateTime endTime = converter.GetEndTimeUtc1(wokout, workoutSamples);
 			endTime.Should().BeCloseTo(nowCst.ToUniversalTime().AddSeconds(500), new TimeSpan(0, 0, 59));
 		}
 
@@ -90,9 +90,9 @@ namespace UnitTests.Conversion
 			var now = System.DateTime.Parse("2021-04-01 03:14:12");
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var timeStamp = converter.GetTimeStamp1(now, offset);
+			string timeStamp = converter.GetTimeStamp1(now, offset);
 
 			if (offset == 0)
 			{
@@ -106,8 +106,8 @@ namespace UnitTests.Conversion
 		[Test]
 		public void ConvertDistanceToMetersTest([Values("km","mi","ft", "KM", "m","unknown", "min/500m")]string unit)
 		{
-			var value = 8677;
-			var converted = FitConverter.ConvertDistanceToMeters(value, unit);
+			int value = 8677;
+			float converted = FitConverter.ConvertDistanceToMeters(value, unit);
 			switch (unit.ToLower())
 			{
 				case "km":
@@ -135,7 +135,7 @@ namespace UnitTests.Conversion
 			var workoutSample = new WorkoutSamples();
 			workoutSample.Summaries = null;
 
-			var converted = FitConverter.GetTotalDistance(workoutSample);
+			float converted = FitConverter.GetTotalDistance(workoutSample);
 			converted.Should().Be(0.0f);
 		}
 
@@ -145,47 +145,47 @@ namespace UnitTests.Conversion
 			var workoutSample = new WorkoutSamples();
 			workoutSample.Summaries = new List<Summary>() { new Summary() { Slug = "notDistance" } };
 
-			var converted = FitConverter.GetTotalDistance(workoutSample);
+			float converted = FitConverter.GetTotalDistance(workoutSample);
 			converted.Should().Be(0.0f);
 		}
 
 		[Test]
 		public void GetTotalDistanceTest_Distance_Is_Converted_To_Meters([Values("mi", "ft", "km", "m", "min/500m")] string unit)
 		{
-			var distance = 600;
+			int distance = 600;
 			var workoutSample = new WorkoutSamples();
 			workoutSample.Summaries = new List<Summary>() 
 			{ 
 				new Summary() { Slug = "distance", Display_Unit = unit, Value = distance } 
 			};
 
-			var expectedDistance = FitConverter.ConvertDistanceToMeters(distance, unit);
+			float expectedDistance = FitConverter.ConvertDistanceToMeters(distance, unit);
 
-			var converted = FitConverter.GetTotalDistance(workoutSample);
+			float converted = FitConverter.GetTotalDistance(workoutSample);
 			converted.Should().Be(expectedDistance);
 		}
 
 		[Test]
 		public void ConvertToMetersPerSecondTest_Is_Converted_To_MetersPerSecond([Values("mph", "kph")] string unit)
 		{
-			var value = 145;
+			int value = 145;
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var metersPerHour = FitConverter.ConvertDistanceToMeters(value, unit);
-			var metersPerMinute = metersPerHour / 60;
-			var metersPerSecond = metersPerMinute / 60;
-			var converted = FitConverter.ConvertToMetersPerSecond(value, unit);
+			float metersPerHour = FitConverter.ConvertDistanceToMeters(value, unit);
+			float metersPerMinute = metersPerHour / 60;
+			float metersPerSecond = metersPerMinute / 60;
+			float converted = FitConverter.ConvertToMetersPerSecond(value, unit);
 			converted.Should().Be(metersPerSecond);
 		}
 
 		[Test]
 		public void ConvertToMetersPerSecondTest_Is_Converted_To_MetersPerSecond_ForRower([Values("min/500m")] string unit)
 		{
-			var value = 5;
+			int value = 5;
 
-			var converted = FitConverter.ConvertToMetersPerSecond(value, unit);
+			float converted = FitConverter.ConvertToMetersPerSecond(value, unit);
 			converted.Should().Be(1.6666666F);
 		}
 
@@ -196,16 +196,16 @@ namespace UnitTests.Conversion
 			workoutSample.Metrics = null;
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var converted = converter.GetMaxSpeedMetersPerSecond1(workoutSample);
+			float converted = converter.GetMaxSpeedMetersPerSecond1(workoutSample);
 			converted.Should().Be(0.0f);
 		}
 
 		[Test]
 		public void GetMaxSpeedMetersPerSecond_MaxSpeed_Is_Converted([Values("mi", "mph", "ft", "km", "kph", "m")] string unit)
 		{
-			var speed = 15.2;
+			double speed = 15.2;
 			var workoutSample = new WorkoutSamples();
 			workoutSample.Metrics = new List<Metric>()
 			{
@@ -217,17 +217,17 @@ namespace UnitTests.Conversion
 			};
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
-			var expectedDistance = FitConverter.ConvertToMetersPerSecond(speed, unit);
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
+			float expectedDistance = FitConverter.ConvertToMetersPerSecond(speed, unit);
 
-			var converted = converter.GetMaxSpeedMetersPerSecond1(workoutSample);
+			float converted = converter.GetMaxSpeedMetersPerSecond1(workoutSample);
 			converted.Should().Be(expectedDistance);
 		}
 
 		[Test]
 		public void GetMaxSpeedMetersPerSecond_MaxSpeed_Is_Converted_ForRower([Values("min/500m")] string unit)
 		{
-			var speed = 5;
+			int speed = 5;
 			var workoutSample = new WorkoutSamples();
 			workoutSample.Metrics = new List<Metric>()
 			{
@@ -235,9 +235,9 @@ namespace UnitTests.Conversion
 			};
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var converted = converter.GetMaxSpeedMetersPerSecond1(workoutSample);
+			float converted = converter.GetMaxSpeedMetersPerSecond1(workoutSample);
 			converted.Should().Be(1.6666666F);
 		}
 
@@ -248,16 +248,16 @@ namespace UnitTests.Conversion
 			workoutSample.Metrics = null;
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var converted = converter.GetAvgSpeedMetersPerSecond1(workoutSample);
+			float converted = converter.GetAvgSpeedMetersPerSecond1(workoutSample);
 			converted.Should().Be(0.0f);
 		}
 
 		[Test]
 		public void GetAvgSpeedMetersPerSecond_MaxSpeed_Is_Converted([Values("mi", "mph", "ft", "km", "kph", "m")] string unit)
 		{
-			var speed = 15.2;
+			double speed = 15.2;
 			var workoutSample = new WorkoutSamples();
 			workoutSample.Metrics = new List<Metric>()
 			{
@@ -269,17 +269,17 @@ namespace UnitTests.Conversion
 			};
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
-			var expectedDistance = FitConverter.ConvertToMetersPerSecond(speed, unit);
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
+			float expectedDistance = FitConverter.ConvertToMetersPerSecond(speed, unit);
 
-			var converted = converter.GetAvgSpeedMetersPerSecond1(workoutSample);
+			float converted = converter.GetAvgSpeedMetersPerSecond1(workoutSample);
 			converted.Should().Be(expectedDistance);
 		}
 
 		[Test]
 		public void GetAvgSpeedMetersPerSecond_MaxSpeed_Is_Converted_ForRower([Values("min/500m")] string unit)
 		{
-			var speed = 5;
+			int speed = 5;
 			var workoutSample = new WorkoutSamples();
 			workoutSample.Metrics = new List<Metric>()
 			{
@@ -287,9 +287,9 @@ namespace UnitTests.Conversion
 			};
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var converted = converter.GetAvgSpeedMetersPerSecond1(workoutSample);
+			float converted = converter.GetAvgSpeedMetersPerSecond1(workoutSample);
 			converted.Should().Be(1.6666666F);
 		}
 
@@ -300,9 +300,9 @@ namespace UnitTests.Conversion
 			workoutSample.Metrics = null;
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var zone = converter.GetHeartRateZone1(1, workoutSample);
+			Zone zone = converter.GetHeartRateZone1(1, workoutSample);
 			zone.Should().BeNull();
 		}
 
@@ -310,9 +310,9 @@ namespace UnitTests.Conversion
 		public void GetHeartRateZone_NullSamples_ReturnsNull()
 		{
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var zone = converter.GetHeartRateZone1(1, null);
+			Zone zone = converter.GetHeartRateZone1(1, null);
 			zone.Should().BeNull();
 		}
 
@@ -330,9 +330,9 @@ namespace UnitTests.Conversion
 			};
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var zone = converter.GetHeartRateZone1(1, workoutSample);
+			Zone zone = converter.GetHeartRateZone1(1, workoutSample);
 			zone.Should().BeNull();
 		}
 
@@ -343,9 +343,9 @@ namespace UnitTests.Conversion
 			workoutSample.Metrics = null;
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var hr = converter.GetUserMaxHeartRate1(workoutSample);
+			byte? hr = converter.GetUserMaxHeartRate1(workoutSample);
 			hr.Should().BeNull();
 		}
 
@@ -353,9 +353,9 @@ namespace UnitTests.Conversion
 		public void GetOutputSummary_NullWorkoutSamples_ReturnsNull()
 		{
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var output = converter.GetOutputSummary1(null);
+			Metric output = converter.GetOutputSummary1(null);
 			output.Should().BeNull();
 		}
 
@@ -366,9 +366,9 @@ namespace UnitTests.Conversion
 			workoutSamples.Metrics = null;
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var output = converter.GetOutputSummary1(workoutSamples);
+			Metric output = converter.GetOutputSummary1(workoutSamples);
 			output.Should().BeNull();
 		}
 
@@ -379,9 +379,9 @@ namespace UnitTests.Conversion
 			workoutSamples.Metrics = new List<Metric>() { new Metric() { Slug = "something" } };
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var output = converter.GetOutputSummary1(workoutSamples);
+			Metric output = converter.GetOutputSummary1(workoutSamples);
 			output.Should().BeNull();
 		}
 
@@ -392,9 +392,9 @@ namespace UnitTests.Conversion
 			workoutSamples.Metrics = new List<Metric>() { new Metric() { Slug = "output",  Max_Value = 100, Average_Value = 50 } };
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var output = converter.GetOutputSummary1(workoutSamples);
+			Metric output = converter.GetOutputSummary1(workoutSamples);
 			output.Should().NotBeNull();
 			output.Max_Value.Should().Be(100);
 			output.Average_Value.Should().Be(50);
@@ -404,9 +404,9 @@ namespace UnitTests.Conversion
 		public void GetHeartRateSummary_NullWorkoutSamples_ReturnsNull()
 		{
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var hr = converter.GetHeartRateSummary1(null);
+			Metric hr = converter.GetHeartRateSummary1(null);
 			hr.Should().BeNull();
 		}
 
@@ -417,9 +417,9 @@ namespace UnitTests.Conversion
 			workoutSamples.Metrics = null;
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var hr = converter.GetHeartRateSummary1(workoutSamples);
+			Metric hr = converter.GetHeartRateSummary1(workoutSamples);
 			hr.Should().BeNull();
 		}
 
@@ -430,9 +430,9 @@ namespace UnitTests.Conversion
 			workoutSamples.Metrics = new List<Metric>() { new Metric() { Slug = "something" } };
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var hr = converter.GetHeartRateSummary1(workoutSamples);
+			Metric hr = converter.GetHeartRateSummary1(workoutSamples);
 			hr.Should().BeNull();
 		}
 
@@ -443,9 +443,9 @@ namespace UnitTests.Conversion
 			workoutSamples.Metrics = new List<Metric>() { new Metric() { Slug = "heart_rate", Max_Value = 100, Average_Value = 50 } };
 
 			var autoMocker = new AutoMocker();
-			var converter = autoMocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = autoMocker.CreateInstance<ConverterInstance>();
 
-			var hr = converter.GetHeartRateSummary1(workoutSamples);
+			Metric hr = converter.GetHeartRateSummary1(workoutSamples);
 			hr.Should().NotBeNull();
 			hr.Max_Value.Should().Be(100);
 			hr.Average_Value.Should().Be(50);
@@ -465,8 +465,8 @@ namespace UnitTests.Conversion
 		{
 			// SETUP
 			var mocker = new AutoMocker();
-			var converter = mocker.CreateInstance<ConverterInstance>();
-			var settingsService = mocker.GetMock<ISettingsService>();
+			ConverterInstance converter = mocker.CreateInstance<ConverterInstance>();
+			Mock<ISettingsService> settingsService = mocker.GetMock<ISettingsService>();
 
 			GarminDeviceInfo outDevice = new GarminDeviceInfo()
 			{
@@ -484,7 +484,7 @@ namespace UnitTests.Conversion
 			settingsService.Setup(s => s.GetCustomDeviceInfoAsync(It.IsAny<string>())).ReturnsAsync(outDevice);
 
 			// ACT
-			var deviceInfo = await converter.GetDeviceInfo1(sport, new Settings());
+			GarminDeviceInfo deviceInfo = await converter.GetDeviceInfo1(sport, new Settings());
 
 			// ASSERT
 			deviceInfo.Name.Should().Be("UserDevice");
@@ -505,9 +505,9 @@ namespace UnitTests.Conversion
 			var config = new Settings() { Format = new Format() { DeviceInfoPath = "somePath" } };
 			mocker.Use(config);
 
-			var converter = mocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = mocker.CreateInstance<ConverterInstance>();
 
-			var fileHandler = mocker.GetMock<IFileHandling>();
+			Mock<IFileHandling> fileHandler = mocker.GetMock<IFileHandling>();
 			GarminDeviceInfo outDevice = null;
 			fileHandler.Setup(x => x.TryDeserializeXml<GarminDeviceInfo>("somePath", out outDevice))
 				.Callback(() =>
@@ -517,7 +517,7 @@ namespace UnitTests.Conversion
 				.Returns(false);
 
 			// ACT
-			var deviceInfo = await converter.GetDeviceInfo1(FitnessDiscipline.Bike_Bootcamp, config);
+			GarminDeviceInfo deviceInfo = await converter.GetDeviceInfo1(FitnessDiscipline.Bike_Bootcamp, config);
 
 			// ASSERT
 			deviceInfo.Name.Should().Be("Forerunner 945");
@@ -535,11 +535,11 @@ namespace UnitTests.Conversion
 		{
 			// SETUP
 			var mocker = new AutoMocker();
-			var converter = mocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = mocker.CreateInstance<ConverterInstance>();
 			var config = new Settings();
 
 			// ACT
-			var deviceInfo = await converter.GetDeviceInfo1(FitnessDiscipline.Cycling, config);
+			GarminDeviceInfo deviceInfo = await converter.GetDeviceInfo1(FitnessDiscipline.Cycling, config);
 
 			// ASSERT
 			deviceInfo.Name.Should().Be("TacxTrainingAppWin");
@@ -565,11 +565,11 @@ namespace UnitTests.Conversion
 		{
 			// SETUP
 			var mocker = new AutoMocker();
-			var converter = mocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = mocker.CreateInstance<ConverterInstance>();
 			var config = new Settings();
 
 			// ACT
-			var deviceInfo = await converter.GetDeviceInfo1(sport, config);
+			GarminDeviceInfo deviceInfo = await converter.GetDeviceInfo1(sport, config);
 
 			// ASSERT
 			deviceInfo.Name.Should().Be("Forerunner 945");
@@ -609,10 +609,10 @@ namespace UnitTests.Conversion
 		{
 			// SETUP
 			var mocker = new AutoMocker();
-			var converter = mocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = mocker.CreateInstance<ConverterInstance>();
 
 			// ACT
-			var ftp = converter.GetCyclingFtp1(workout, userData);
+			ushort? ftp = converter.GetCyclingFtp1(workout, userData);
 
 			// ASSERT
 			ftp.Should().Be(expectedFtp);
@@ -640,10 +640,10 @@ namespace UnitTests.Conversion
 		{
 			// SETUP
 			var mocker = new AutoMocker();
-			var converter = mocker.CreateInstance<ConverterInstance>();
+			ConverterInstance converter = mocker.CreateInstance<ConverterInstance>();
 
 			// ACT
-			var calorieSummary = ConverterInstance.GetCalorieSummary(samples);
+			Summary calorieSummary = ConverterInstance.GetCalorieSummary(samples);
 
 			// ASSERT
 			calorieSummary?.Value.Should().Be(expectedCalories);

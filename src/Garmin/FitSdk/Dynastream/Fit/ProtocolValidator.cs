@@ -97,7 +97,7 @@ namespace Dynastream.Fit
                 return false;
             }
 
-            foreach (var fld in mesg.Fields)
+            foreach (Field fld in mesg.Fields)
             {
                 int typeNum = fld.Type & Fit.BaseTypeNumMask;
 
@@ -122,7 +122,7 @@ namespace Dynastream.Fit
                 return false;
             }
 
-            foreach (var fld in defn.GetFields())
+            foreach (FieldDefinition fld in defn.GetFields())
             {
                 int typeNum = fld.Type & Fit.BaseTypeNumMask;
 

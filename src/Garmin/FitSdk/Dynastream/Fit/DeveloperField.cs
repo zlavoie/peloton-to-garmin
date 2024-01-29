@@ -12,12 +12,9 @@
 
 #endregion
 
-using System;
-using System.IO;
-
 namespace Dynastream.Fit
 {
-    public class DeveloperField
+	public class DeveloperField
         : FieldBase
     {
         #region Fields
@@ -60,7 +57,7 @@ namespace Dynastream.Fit
             {
                 if (m_definition.IsDefined)
                 {
-                    var msg = m_definition.DeveloperIdMesg;
+					DeveloperDataIdMesg msg = m_definition.DeveloperIdMesg;
                     byte[] appId = new byte[msg.GetNumApplicationId()];
 
                     for (int i = 0; i < appId.Length; i++)

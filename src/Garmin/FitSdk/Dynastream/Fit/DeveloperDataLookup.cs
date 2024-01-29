@@ -15,12 +15,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Dynastream.Fit
 {
-    internal class DeveloperDataLookup
+	internal class DeveloperDataLookup
     {
         private readonly Dictionary<DeveloperDataKey, FieldDescriptionMesg> m_fieldDescriptionMesgs;
         private readonly Dictionary<byte, DeveloperDataIdMesg> m_developerDataIdMesgs;
@@ -65,7 +64,7 @@ namespace Dynastream.Fit
                                           x.DeveloperDataIndex ==
                                           index)
                                   .ToList();
-            foreach (var key in keysToRemove)
+            foreach (DeveloperDataKey key in keysToRemove)
             {
                 m_fieldDescriptionMesgs.Remove(key);
             }
@@ -86,8 +85,8 @@ namespace Dynastream.Fit
 
                 m_fieldDescriptionMesgs[key] = mesg;
 
-                // Build a Description of the pairing we just created
-                var pair = GetMesgs(key);
+				// Build a Description of the pairing we just created
+				Tuple<DeveloperDataIdMesg, FieldDescriptionMesg> pair = GetMesgs(key);
                 if (pair != null)
                 {
                     desc = new DeveloperFieldDescription(pair.Item1, pair.Item2);

@@ -13,18 +13,15 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
-using System.IO;
 using System.Linq;
 
 namespace Dynastream.Fit
 {
-    /// <summary>
-    /// Implements the NmeaSentence profile message.
-    /// </summary>
-    public class NmeaSentenceMesg : Mesg
+	/// <summary>
+	/// Implements the NmeaSentence profile message.
+	/// </summary>
+	public class NmeaSentenceMesg : Mesg
     {
         #region Fields
         #endregion

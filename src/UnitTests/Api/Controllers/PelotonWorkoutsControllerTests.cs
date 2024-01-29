@@ -23,11 +23,11 @@ namespace UnitTests.Api.Controllers
 		public async Task GetAsync_WithInvalid_PageSize_Returns400([Values(-1, 0)]int pageSize)
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
+			PelotonWorkoutsController controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
 
 			var request = new PelotonWorkoutsGetRequest() { PageSize = pageSize };
 
-			var response = await controller.GetAsync(request);
+			ActionResult<PelotonWorkoutsGetResponse> response = await controller.GetAsync(request);
 
 			var result = response.Result as BadRequestObjectResult;
 			result.Should().NotBeNull();
@@ -39,11 +39,11 @@ namespace UnitTests.Api.Controllers
 		public async Task GetAsync_WithInvalid_PageIndex_Returns400([Values(-1)] int pageIndex)
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
+			PelotonWorkoutsController controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
 
 			var request = new PelotonWorkoutsGetRequest() { PageIndex = pageIndex, PageSize = 5 };
 
-			var response = await controller.GetAsync(request);
+			ActionResult<PelotonWorkoutsGetResponse> response = await controller.GetAsync(request);
 
 			var result = response.Result as BadRequestObjectResult;
 			result.Should().NotBeNull();
@@ -56,8 +56,8 @@ namespace UnitTests.Api.Controllers
 		{
 			// setup
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
-			var service = autoMocker.GetMock<IPelotonService>();
+			PelotonWorkoutsController controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
+			Mock<IPelotonService> service = autoMocker.GetMock<IPelotonService>();
 
 			var results = new PagedPelotonResponse<Workout>()
 			{
@@ -81,10 +81,10 @@ namespace UnitTests.Api.Controllers
 			var request = new PelotonWorkoutsGetRequest() { PageIndex = 0, PageSize = 5 };
 
 			// act
-			var actionResult = await controller.GetAsync(request);
+			ActionResult<PelotonWorkoutsGetResponse> actionResult = await controller.GetAsync(request);
 
 			// assert
-			var response = actionResult.Value;
+			PelotonWorkoutsGetResponse response = actionResult.Value;
 			response.Should().NotBeNull();
 
 			response.Items.Should().BeInDescendingOrder(i => i.CreatedAt);
@@ -95,8 +95,8 @@ namespace UnitTests.Api.Controllers
 		{
 			// setup
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
-			var service = autoMocker.GetMock<IPelotonService>();
+			PelotonWorkoutsController controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
+			Mock<IPelotonService> service = autoMocker.GetMock<IPelotonService>();
 
 			var results = new PagedPelotonResponse<Workout>()
 			{
@@ -120,10 +120,10 @@ namespace UnitTests.Api.Controllers
 			var request = new PelotonWorkoutsGetRequest() { PageIndex = 0, PageSize = 5 };
 
 			// act
-			var actionResult = await controller.GetAsync(request);
+			ActionResult<PelotonWorkoutsGetResponse> actionResult = await controller.GetAsync(request);
 
 			// assert
-			var response = actionResult.Value;
+			PelotonWorkoutsGetResponse response = actionResult.Value;
 			response.Should().NotBeNull();
 
 			response.PageSize.Should().Be(results.Limit);
@@ -138,15 +138,15 @@ namespace UnitTests.Api.Controllers
 		public async Task GetAsync_When_Service_Throws_ArgumentException_Returns_BadRequest()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
-			var service = autoMocker.GetMock<IPelotonService>();
+			PelotonWorkoutsController controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
+			Mock<IPelotonService> service = autoMocker.GetMock<IPelotonService>();
 
 			service.Setup(s => s.GetPelotonWorkoutsAsync(It.IsAny<int>(), It.IsAny<int>()))
 				.Throws(new ArgumentException("Some invalid param"));
 
 			var request = new PelotonWorkoutsGetRequest() { PageSize = 5 };
 
-			var response = await controller.GetAsync(request);
+			ActionResult<PelotonWorkoutsGetResponse> response = await controller.GetAsync(request);
 
 			var result = response.Result as BadRequestObjectResult;
 			result.Should().NotBeNull();
@@ -158,15 +158,15 @@ namespace UnitTests.Api.Controllers
 		public async Task GetAsync_When_Service_Throws_PelotonAuthenticationException_Returns_BadRequest()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
-			var service = autoMocker.GetMock<IPelotonService>();
+			PelotonWorkoutsController controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
+			Mock<IPelotonService> service = autoMocker.GetMock<IPelotonService>();
 
 			service.Setup(s => s.GetPelotonWorkoutsAsync(It.IsAny<int>(), It.IsAny<int>()))
 				.Throws(new PelotonAuthenticationError("Peloton auth failed."));
 
 			var request = new PelotonWorkoutsGetRequest() { PageSize = 5 };
 
-			var response = await controller.GetAsync(request);
+			ActionResult<PelotonWorkoutsGetResponse> response = await controller.GetAsync(request);
 
 			var result = response.Result as BadRequestObjectResult;
 			result.Should().NotBeNull();
@@ -178,15 +178,15 @@ namespace UnitTests.Api.Controllers
 		public async Task GetAsync_When_Service_Throws_Exception_Returns_BadRequest()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
-			var service = autoMocker.GetMock<IPelotonService>();
+			PelotonWorkoutsController controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
+			Mock<IPelotonService> service = autoMocker.GetMock<IPelotonService>();
 
 			service.Setup(s => s.GetPelotonWorkoutsAsync(It.IsAny<int>(), It.IsAny<int>()))
 				.Throws(new Exception("Some unhandled case."));
 
 			var request = new PelotonWorkoutsGetRequest() { PageSize = 5 };
 
-			var response = await controller.GetAsync(request);
+			ActionResult<PelotonWorkoutsGetResponse> response = await controller.GetAsync(request);
 
 			var result = response.Result as ObjectResult;
 			result.Should().NotBeNull();
@@ -199,12 +199,12 @@ namespace UnitTests.Api.Controllers
 		public async Task GetAllAsync_When_Future_SinceDate_Returns400()
 		{
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
+			PelotonWorkoutsController controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
 
-			var now = DateTime.UtcNow;
+			DateTime now = DateTime.UtcNow;
 			var request = new PelotonWorkoutsGetAllRequest() { SinceDate = now.AddDays(1) };
 
-			var response = await controller.GetAsync(request);
+			ActionResult<PelotonWorkoutsGetAllResponse> response = await controller.GetAsync(request);
 
 			var result = response.Result as BadRequestObjectResult;
 			result.Should().NotBeNull();
@@ -217,10 +217,10 @@ namespace UnitTests.Api.Controllers
 		{
 			// setup
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
-			var service = autoMocker.GetMock<IPelotonService>();
+			PelotonWorkoutsController controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
+			Mock<IPelotonService> service = autoMocker.GetMock<IPelotonService>();
 
-			var results = new List<Workout>()
+			ServiceResult<ICollection<Workout>> results = new List<Workout>()
 			{
 				new Workout() { Created_At = DateTime.Now.AddMinutes(-15).Ticks },
 				new Workout() { Created_At = DateTime.Now.AddMinutes(-3).Ticks },
@@ -234,10 +234,10 @@ namespace UnitTests.Api.Controllers
 			var request = new PelotonWorkoutsGetAllRequest() { SinceDate = DateTime.UtcNow.AddDays(-1) };
 
 			// act
-			var actionResult = await controller.GetAsync(request);
+			ActionResult<PelotonWorkoutsGetAllResponse> actionResult = await controller.GetAsync(request);
 
 			// assert
-			var response = actionResult.Value;
+			PelotonWorkoutsGetAllResponse response = actionResult.Value;
 			response.Should().NotBeNull();
 
 			response.Items.Should().BeInDescendingOrder(i => i.CreatedAt);
@@ -248,10 +248,10 @@ namespace UnitTests.Api.Controllers
 		{
 			// setup
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
-			var service = autoMocker.GetMock<IPelotonService>();
+			PelotonWorkoutsController controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
+			Mock<IPelotonService> service = autoMocker.GetMock<IPelotonService>();
 
-			var results = new List<Workout>()
+			ServiceResult<ICollection<Workout>> results = new List<Workout>()
 			{
 				new Workout() { Id = "1", Created_At = DateTime.Now.AddMinutes(-15).Ticks, Status = "COMPLETE" },
 				new Workout() { Id = "2", Created_At = DateTime.Now.AddMinutes(-3).Ticks },
@@ -265,10 +265,10 @@ namespace UnitTests.Api.Controllers
 			var request = new PelotonWorkoutsGetAllRequest() { SinceDate = DateTime.UtcNow.AddDays(-1), WorkoutStatusFilter = filter };
 
 			// act
-			var actionResult = await controller.GetAsync(request);
+			ActionResult<PelotonWorkoutsGetAllResponse> actionResult = await controller.GetAsync(request);
 
 			// assert
-			var response = actionResult.Value;
+			PelotonWorkoutsGetAllResponse response = actionResult.Value;
 			response.Should().NotBeNull();
 
 			if (filter == WorkoutStatus.Completed)
@@ -292,10 +292,10 @@ namespace UnitTests.Api.Controllers
 		{
 			// setup
 			var autoMocker = new AutoMocker();
-			var controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
-			var service = autoMocker.GetMock<IPelotonService>();
+			PelotonWorkoutsController controller = autoMocker.CreateInstance<PelotonWorkoutsController>();
+			Mock<IPelotonService> service = autoMocker.GetMock<IPelotonService>();
 
-			var results = new List<Workout>()
+			ServiceResult<ICollection<Workout>> results = new List<Workout>()
 			{
 				new Workout() { Id = "1", Created_At = DateTime.Now.AddMinutes(-15).Ticks, Status = "COMPLETE", Fitness_Discipline = FitnessDiscipline.Running },
 				new Workout() { Id = "2", Created_At = DateTime.Now.AddMinutes(-3).Ticks, Fitness_Discipline = FitnessDiscipline.Meditation },
@@ -310,10 +310,10 @@ namespace UnitTests.Api.Controllers
 			var request = new PelotonWorkoutsGetAllRequest() { SinceDate = DateTime.UtcNow.AddDays(-1), ExcludeWorkoutTypes = excludedTypes };
 
 			// act
-			var actionResult = await controller.GetAsync(request);
+			ActionResult<PelotonWorkoutsGetAllResponse> actionResult = await controller.GetAsync(request);
 
 			// assert
-			var response = actionResult.Value;
+			PelotonWorkoutsGetAllResponse response = actionResult.Value;
 			response.Should().NotBeNull();
 
 			response.Items.Count.Should().Be(3);
